@@ -1,0 +1,991 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="https://fonts.loli.net/css?family=Lato:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.1/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css">
+
+<script class="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"wangmurong.org.cn","root":"/","images":"/images","scheme":"Pisces","version":"8.0.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}};
+  </script>
+<meta name="description" content="流程图是表达算法思想最为有效的图形工具。作为计算机专业的学生，我们经常需要在文档中使用流程图来描述算法。在 LaTeX 中使用流程图可以通过 TikZ 或 flowchart 宏包来实现，但从本质上来说 flowchart 宏包也是使用 TikZ 宏包来实现的。下面分别通过一个简单的例子来对这两种方法进行说明。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="在 LaTeX 中使用流程图">
+<meta property="og:url" content="http://wangmurong.org.cn/archives/6949b60b.html">
+<meta property="og:site_name" content="风陵渡">
+<meta property="og:description" content="流程图是表达算法思想最为有效的图形工具。作为计算机专业的学生，我们经常需要在文档中使用流程图来描述算法。在 LaTeX 中使用流程图可以通过 TikZ 或 flowchart 宏包来实现，但从本质上来说 flowchart 宏包也是使用 TikZ 宏包来实现的。下面分别通过一个简单的例子来对这两种方法进行说明。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://wangmurong.org.cn/img/flowchart.jpg">
+<meta property="og:image" content="http://wangmurong.org.cn/img/flowchart2.jpg">
+<meta property="og:image" content="http://wangmurong.org.cn/img/in-parise-doubt.jpg">
+<meta property="article:published_time" content="2015-06-14T00:00:00.000Z">
+<meta property="article:modified_time" content="2020-11-18T06:51:53.297Z">
+<meta property="article:author" content="三流先生">
+<meta property="article:tag" content="LaTeX">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://wangmurong.org.cn/img/flowchart.jpg">
+
+
+<link rel="canonical" href="http://wangmurong.org.cn/archives/6949b60b.html">
+
+
+<script class="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+<title>在 LaTeX 中使用流程图 | 风陵渡</title>
+  
+
+
+
+  <noscript>
+  <style>
+  body { margin-top: 2rem; }
+
+  .use-motion .menu-item,
+  .use-motion .sidebar,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header {
+    visibility: visible;
+  }
+
+  .use-motion .header,
+  .use-motion .site-brand-container .toggle,
+  .use-motion .footer { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle,
+  .use-motion .custom-logo-image {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line {
+    transform: scaleX(1);
+  }
+
+  .search-pop-overlay, .sidebar-nav { display: none; }
+  .sidebar-panel { display: block; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="风陵渡" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">风陵渡</h1>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">且趁闲身未老，须放我些子疏狂</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-gallery">
+
+    <a href="/gallery/" rel="section"><i class="fa fa-camera fa-fw"></i>图集</a>
+
+  </li>
+        <li class="menu-item menu-item-movies">
+
+    <a href="/movies/" rel="section"><i class="fa fa-film fa-fw"></i>观影</a>
+
+  </li>
+        <li class="menu-item menu-item-books">
+
+    <a href="/books/" rel="section"><i class="fa fa-book fa-fw"></i>阅读</a>
+
+  </li>
+        <li class="menu-item menu-item-whisper">
+
+    <a href="/whisper/" rel="section"><i class="fa fa-sticky-note fa-fw"></i>碎笔</a>
+
+  </li>
+        <li class="menu-item menu-item-excert">
+
+    <a href="/excert/" rel="section"><i class="fa fa-feather-alt fa-fw"></i>摘抄</a>
+
+  </li>
+        <li class="menu-item menu-item-favorite">
+
+    <a href="/favorite/" rel="section"><i class="fa fa-star fa-fw"></i>收藏</a>
+
+  </li>
+        <li class="menu-item menu-item-tools">
+
+    <a href="/tools/" rel="section"><i class="fa fa-tools fa-fw"></i>工具</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <section class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8-flowchart-%E5%AE%8F%E5%8C%85%E7%BB%98%E5%88%B6%E6%B5%81%E7%A8%8B%E5%9B%BE"><span class="nav-number">1.</span> <span class="nav-text">使用 flowchart 宏包绘制流程图</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%9B%B4%E6%8E%A5%E4%BD%BF%E7%94%A8-TikZ-%E5%AE%8F%E5%8C%85%E7%BB%98%E5%88%B6%E6%B5%81%E7%A8%8B%E5%9B%BE%E3%80%82"><span class="nav-number">2.</span> <span class="nav-text">直接使用 TikZ 宏包绘制流程图。</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%96%B9%E6%B3%95%E6%AF%94%E8%BE%83"><span class="nav-number">3.</span> <span class="nav-text">方法比较</span></a></li></ol></div>
+        </section>
+        <!--/noindex-->
+
+        <section class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="三流先生"
+      src="/images/codercat.jpg">
+  <p class="site-author-name" itemprop="name">三流先生</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">125</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">24</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/latexers" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;latexers" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i></a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:murongwang@outlook.com.com" title="E-Mail → mailto:murongwang@outlook.com.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i></a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/atom.xml" title="Rss → &#x2F;atom.xml"><i class="fa fa-rss fa-fw"></i></a>
+      </span>
+  </div>
+
+
+
+    <div class="links-of-blogroll motion-element links-of-blogroll-block">
+      <div class="links-of-blogroll-title">
+        <!-- modify icon to fire by szw -->
+        <i class="fa fa-history fa-" aria-hidden="true"></i>
+        近期文章
+      </div>
+      <ul class="links-of-blogroll-list">
+        
+        
+          <li>
+            <a href="/archives/4998123a.html" title="且慢，前面听说风很大" target="_blank">且慢，前面听说风很大</a>
+          </li>
+        
+          <li>
+            <a href="/archives/e25d1b6d.html" title="泯灭之路——大屠杀之根源、历史与余波" target="_blank">泯灭之路——大屠杀之根源、历史与余波</a>
+          </li>
+        
+          <li>
+            <a href="/archives/f47cb09a.html" title="羊城两周记" target="_blank">羊城两周记</a>
+          </li>
+        
+          <li>
+            <a href="/archives/10c90e85.html" title="增强现实显微镜——实时自动癌症检测" target="_blank">增强现实显微镜——实时自动癌症检测</a>
+          </li>
+        
+          <li>
+            <a href="/archives/1994da85.html" title="岁月神偷" target="_blank">岁月神偷</a>
+          </li>
+        
+      </ul>
+    </div>
+
+
+<div style="">
+  <canvas id="canvas" style="width:60%;">当前浏览器不支持canvas，请更换浏览器后再试</canvas>
+</div>
+<script>
+(function(){
+
+   var digit=
+    [
+        [
+            [0,0,1,1,1,0,0],
+            [0,1,1,0,1,1,0],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [0,1,1,0,1,1,0],
+            [0,0,1,1,1,0,0]
+        ],//0
+        [
+            [0,0,0,1,1,0,0],
+            [0,1,1,1,1,0,0],
+            [0,0,0,1,1,0,0],
+            [0,0,0,1,1,0,0],
+            [0,0,0,1,1,0,0],
+            [0,0,0,1,1,0,0],
+            [0,0,0,1,1,0,0],
+            [0,0,0,1,1,0,0],
+            [0,0,0,1,1,0,0],
+            [1,1,1,1,1,1,1]
+        ],//1
+        [
+            [0,1,1,1,1,1,0],
+            [1,1,0,0,0,1,1],
+            [0,0,0,0,0,1,1],
+            [0,0,0,0,1,1,0],
+            [0,0,0,1,1,0,0],
+            [0,0,1,1,0,0,0],
+            [0,1,1,0,0,0,0],
+            [1,1,0,0,0,0,0],
+            [1,1,0,0,0,1,1],
+            [1,1,1,1,1,1,1]
+        ],//2
+        [
+            [1,1,1,1,1,1,1],
+            [0,0,0,0,0,1,1],
+            [0,0,0,0,1,1,0],
+            [0,0,0,1,1,0,0],
+            [0,0,1,1,1,0,0],
+            [0,0,0,0,1,1,0],
+            [0,0,0,0,0,1,1],
+            [0,0,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [0,1,1,1,1,1,0]
+        ],//3
+        [
+            [0,0,0,0,1,1,0],
+            [0,0,0,1,1,1,0],
+            [0,0,1,1,1,1,0],
+            [0,1,1,0,1,1,0],
+            [1,1,0,0,1,1,0],
+            [1,1,1,1,1,1,1],
+            [0,0,0,0,1,1,0],
+            [0,0,0,0,1,1,0],
+            [0,0,0,0,1,1,0],
+            [0,0,0,1,1,1,1]
+        ],//4
+        [
+            [1,1,1,1,1,1,1],
+            [1,1,0,0,0,0,0],
+            [1,1,0,0,0,0,0],
+            [1,1,1,1,1,1,0],
+            [0,0,0,0,0,1,1],
+            [0,0,0,0,0,1,1],
+            [0,0,0,0,0,1,1],
+            [0,0,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [0,1,1,1,1,1,0]
+        ],//5
+        [
+            [0,0,0,0,1,1,0],
+            [0,0,1,1,0,0,0],
+            [0,1,1,0,0,0,0],
+            [1,1,0,0,0,0,0],
+            [1,1,0,1,1,1,0],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [0,1,1,1,1,1,0]
+        ],//6
+        [
+            [1,1,1,1,1,1,1],
+            [1,1,0,0,0,1,1],
+            [0,0,0,0,1,1,0],
+            [0,0,0,0,1,1,0],
+            [0,0,0,1,1,0,0],
+            [0,0,0,1,1,0,0],
+            [0,0,1,1,0,0,0],
+            [0,0,1,1,0,0,0],
+            [0,0,1,1,0,0,0],
+            [0,0,1,1,0,0,0]
+        ],//7
+        [
+            [0,1,1,1,1,1,0],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [0,1,1,1,1,1,0],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [0,1,1,1,1,1,0]
+        ],//8
+        [
+            [0,1,1,1,1,1,0],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [0,1,1,1,0,1,1],
+            [0,0,0,0,0,1,1],
+            [0,0,0,0,0,1,1],
+            [0,0,0,0,1,1,0],
+            [0,0,0,1,1,0,0],
+            [0,1,1,0,0,0,0]
+        ],//9
+        [
+            [0,0,0,0,0,0,0],
+            [0,0,1,1,1,0,0],
+            [0,0,1,1,1,0,0],
+            [0,0,1,1,1,0,0],
+            [0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0],
+            [0,0,1,1,1,0,0],
+            [0,0,1,1,1,0,0],
+            [0,0,1,1,1,0,0],
+            [0,0,0,0,0,0,0]
+        ]//:
+    ];
+
+var canvas = document.getElementById('canvas');
+
+if(canvas.getContext){
+    var cxt = canvas.getContext('2d');
+    //声明canvas的宽高
+    var H = 100,W = 700;
+    canvas.height = H;
+    canvas.width = W;
+    cxt.fillStyle = '#f00';
+    cxt.fillRect(10,10,50,50);
+
+    //存储时间数据
+    var data = [];
+    //存储运动的小球
+    var balls = [];
+    //设置粒子半径
+    var R = canvas.height/20-1;
+    (function(){
+        var temp = /(\d)(\d):(\d)(\d):(\d)(\d)/.exec(new Date());
+        //存储时间数字，由十位小时、个位小时、冒号、十位分钟、个位分钟、冒号、十位秒钟、个位秒钟这7个数字组成
+        data.push(temp[1],temp[2],10,temp[3],temp[4],10,temp[5],temp[6]);
+    })();
+
+    /*生成点阵数字*/
+    function renderDigit(index,num){
+        for(var i = 0; i < digit[num].length; i++){
+            for(var j = 0; j < digit[num][i].length; j++){
+                if(digit[num][i][j] == 1){
+                    cxt.beginPath();
+                    cxt.arc(14*(R+2)*index + j*2*(R+1)+(R+1),i*2*(R+1)+(R+1),R,0,2*Math.PI);
+                    cxt.closePath();
+                    cxt.fill();
+                }
+            }
+        }
+    }
+
+    /*更新时钟*/
+    function updateDigitTime(){
+        var changeNumArray = [];
+        var temp = /(\d)(\d):(\d)(\d):(\d)(\d)/.exec(new Date());
+        var NewData = [];
+        NewData.push(temp[1],temp[2],10,temp[3],temp[4],10,temp[5],temp[6]);
+        for(var i = data.length-1; i >=0 ; i--){
+            //时间发生变化
+            if(NewData[i] !== data[i]){
+                //将变化的数字值和在data数组中的索引存储在changeNumArray数组中
+                changeNumArray.push(i+'_'+(Number(data[i])+1)%10);
+            }
+        }
+        //增加小球
+        for(var i = 0; i< changeNumArray.length; i++){
+            addBalls.apply(this,changeNumArray[i].split('_'));
+        }
+        data = NewData.concat();
+    }
+
+    /*更新小球状态*/
+    function updateBalls(){
+        for(var i = 0; i < balls.length; i++){
+            balls[i].stepY += balls[i].disY;
+            balls[i].x += balls[i].stepX;
+            balls[i].y += balls[i].stepY;
+            if(balls[i].x > W + R || balls[i].y > H + R){
+                balls.splice(i,1);
+                i--;
+            }
+        }
+    }
+
+    /*增加要运动的小球*/
+    function addBalls(index,num){
+        var numArray = [1,2,3];
+        var colorArray =  ["#3BE","#09C","#A6C","#93C","#9C0","#690","#FB3","#F80","#F44","#C00"];
+        for(var i = 0; i < digit[num].length; i++){
+            for(var j = 0; j < digit[num][i].length; j++){
+                if(digit[num][i][j] == 1){
+                    var ball = {
+                        x:14*(R+2)*index + j*2*(R+1)+(R+1),
+                        y:i*2*(R+1)+(R+1),
+                        stepX:Math.floor(Math.random() * 4 -2),
+                        stepY:-2*numArray[Math.floor(Math.random()*numArray.length)],
+                        color:colorArray[Math.floor(Math.random()*colorArray.length)],
+                        disY:1
+                    };
+                    balls.push(ball);
+                }
+            }
+        }
+    }
+
+    /*渲染*/
+    function render(){
+        //重置画布宽度，达到清空画布的效果
+        canvas.height = 100;
+        //渲染时钟
+        for(var i = 0; i < data.length; i++){
+            renderDigit(i,data[i]);
+        }
+        //渲染小球
+        for(var i = 0; i < balls.length; i++){
+            cxt.beginPath();
+            cxt.arc(balls[i].x,balls[i].y,R,0,2*Math.PI);
+            cxt.fillStyle = balls[i].color;
+            cxt.closePath();
+            cxt.fill();
+        }
+    }
+
+    clearInterval(oTimer);
+    var oTimer = setInterval(function(){
+        //更新时钟
+        updateDigitTime();
+        //更新小球状态
+        updateBalls();
+        //渲染
+        render();
+    },50);
+}
+
+})();
+</script>
+        </section>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://wangmurong.org.cn/archives/6949b60b.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/codercat.jpg">
+      <meta itemprop="name" content="三流先生">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="风陵渡">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          在 LaTeX 中使用流程图
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2015-06-14 00:00:00" itemprop="dateCreated datePublished" datetime="2015-06-14T00:00:00Z">2015-06-14</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2020-11-18 06:51:53" itemprop="dateModified" datetime="2020-11-18T06:51:53Z">2020-11-18</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E6%8E%92%E7%89%88/" itemprop="url" rel="index"><span itemprop="name">排版</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+<div class="translate-style">
+繁/简：<a id="translateLink" href="javascript:translatePage();">繁体
+</a>
+</div>
+<script type="text/javascript" src="/js/tw_cn.js"></script>
+<script type="text/javascript">
+var defaultEncoding = 2; //网站编写字体是否繁体，1-繁体，2-简体
+var translateDelay = 0; //延迟时间,若不在前, 要设定延迟翻译时间, 如100表示100ms,默认为0
+var cookieDomain = "https://tding.top/"; //Cookie地址, 一定要设定, 通常为你的网址
+var msgToTraditionalChinese = "繁体"; //此处可以更改为你想要显示的文字
+var msgToSimplifiedChinese = "简体"; //同上，但两处均不建议更改
+var translateButtonId = "translateLink"; //默认互换id
+translateInitilization();
+</script>
+
+
+      </div>
+      <div class="post-meta">
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>3.9k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>4 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <p>流程图是表达算法思想最为有效的图形工具。作为计算机专业的学生，我们经常需要在文档中使用流程图来描述算法。在 LaTeX 中使用流程图可以通过 Ti<em>k</em>Z 或 flowchart 宏包来实现，但从本质上来说 flowchart 宏包也是使用 Ti<em>k</em>Z 宏包来实现的。下面分别通过一个简单的例子来对这两种方法进行说明。<a id="more"></a></p>
+<h2 id="使用-flowchart-宏包绘制流程图"><a href="#使用-flowchart-宏包绘制流程图" class="headerlink" title="使用 flowchart 宏包绘制流程图"></a>使用 flowchart 宏包绘制流程图</h2><p>flowchart 宏包根据 IBM 提出的流程图标准，定义了流程图中最常用的五种标准形状，包括：</p>
+<ol>
+<li>PROCESS: 一切函数过程</li>
+<li>DECESION: 条件判断</li>
+<li>PREDEFINED　PROCESS：预定义过程</li>
+<li>STORAGE: 数据存储</li>
+<li>TERMINAL: 开始，结束</li>
+</ol>
+<p>下面，我们通过一个简单的示例代码来说明，请注意看代码中的注释</p>
+<pre><code> %!TEX program = xelatex
+ % 使用 ctexart 文类，UTF-8 
+ % 作者：王泽宇
+\documentclass[UTF8]&#123;ctexart&#125;
+\usepackage&#123;tikz,mathpazo&#125;
+\usetikzlibrary&#123;shapes.geometric, arrows&#125;
+\usepackage&#123;flowchart&#125;
+\begin&#123;document&#125;
+\begin&#123;tikzpicture&#125;[font=&#123;\sf \small&#125;]
+\def \smbwd&#123;2cm&#125;
+\thispagestyle&#123;empty&#125;
+
+ %定义流程图的具体形状
+\node (start) at (0,0) [draw, terminal,minimum width=\smbwd, minimum height=0.5cm] &#123;开始&#125;;      % 定义开始 
+\node (getdata) at (0,-1.5) [draw, predproc, align=left,minimum width=\smbwd,minimum height=1cm] &#123;读取数据&#125;;        %定义预处理过程，读取数据
+\node (decide) at (0,-3.5) [draw, decision, minimum width=\smbwd, minimum height=1cm] &#123;判断条件&#125;;    %定义判断条件
+\node (storage) at (0,-5.5) [draw, storage, minimum width=\smbwd, minimum height=1cm] &#123;数据存储&#125;;     %定义数据存储
+\node (process) at (3,-5.5) [draw, process, minimum width=\smbwd, minimum height=1cm] &#123;处理过程&#125;;      %定义处理过程
+\coordinate (point1) at (0,-6.75);
+\node (end) at (0,-7.75) [draw, terminal,minimum width=\smbwd,minimum height=0.5cm] &#123;结束&#125;;        %定义结束
+
+ %连接定义的形状，绘制流程图--表示垂直线，|表示箭头方向
+\draw[-&gt;] (start) -- (getdata);
+\draw[-&gt;] (getdata) -- (decide);
+\draw[-&gt;] (decide) -| node[above]&#123;是&#125; (process);
+\draw[-&gt;] (decide) -- node[above]&#123;否&#125;(storage);
+\draw[-&gt;] (process) |- (point1);
+\draw[-&gt;] (storage) -- (point1) -- (end);
+\end&#123;tikzpicture&#125;
+\end&#123;document&#125;</code></pre>
+<p>以上代码编译结果如图</p>
+<p><img src="/img/flowchart.jpg" alt="flowchart1.jpg"></p>
+<p>使用 flowchart 和 Ti<em>k</em>Z 绘制流程图，主要包括两个步骤：</p>
+<ul>
+<li>绘制流程图的具体形状。该过程主要是利用 flowchart 宏包的预定义形状，根据流程图具体需要实例化，即定义形状的大小，高度宽度等信息。定义形状时，有一点需要注意的是，在需要使用折线时，需要定义折线的转折点，如示例中的 point1 。</li>
+<li>将形状使用线连接，得到流程图。这部分比较简单，只要记住线和箭头的表示方法即可。</li>
+</ul>
+<h2 id="直接使用-TikZ-宏包绘制流程图。"><a href="#直接使用-TikZ-宏包绘制流程图。" class="headerlink" title="直接使用 TikZ 宏包绘制流程图。"></a>直接使用 Ti<em>k</em>Z 宏包绘制流程图。</h2><p>flowchart 定义的形状数量比较少，可能满足不了绘制复杂流程图的需要，我们还可以直接使用 Ti<em>k</em>Z 强大的绘图功能来实现流程图的绘制。还是先看示例代码，配合注释，再进行讲解吧。 </p>
+<pre><code> %!TEX program = xelatex
+ % 使用 ctexart 文类，UTF-8 编码
+ % 作者：王泽宇
+\documentclass[UTF8]&#123;ctexart&#125;
+\usepackage&#123;tikz,mathpazo&#125;
+\usetikzlibrary&#123;shapes.geometric, arrows&#125;
+\begin&#123;document&#125;
+\thispagestyle&#123;empty&#125;
+ % 流程图定义基本形状
+\tikzstyle&#123;startstop&#125; = [rectangle, rounded corners, minimum width=3cm, minimum height=1cm,text centered, draw=black, fill=red!30]
+\tikzstyle&#123;io&#125; = [trapezium, trapezium left angle=70, trapezium right angle=110, minimum width=3cm, minimum height=1cm, text centered, draw=black, fill=blue!30]
+\tikzstyle&#123;process&#125; = [rectangle, minimum width=3cm, minimum height=1cm, text centered, draw=black, fill=orange!30]
+\tikzstyle&#123;decision&#125; = [diamond, minimum width=3cm, minimum height=1cm, text centered, draw=black, fill=green!30]
+\tikzstyle&#123;arrow&#125; = [thick,-&gt;,&gt;=stealth]
+
+\begin&#123;tikzpicture&#125;[node distance=2cm]
+ %定义流程图具体形状
+\node (start) [startstop] &#123;Start&#125;;
+\node (in1) [io, below of=start] &#123;Input&#125;;
+\node (pro1) [process, below of=in1] &#123;Process 1&#125;;
+\node (dec1) [decision, below of=pro1, yshift=-0.5cm] &#123;Decision 1&#125;;
+\node (pro2a) [process, below of=dec1, yshift=-0.5cm] &#123;Process 2a&#125;;
+\node (pro2b) [process, right of=dec1, xshift=2cm] &#123;Process 2b&#125;;
+\node (out1) [io, below of=pro2a] &#123;Output&#125;;
+\node (stop) [startstop, below of=out1] &#123;Stop&#125;;
+
+ %连接具体形状
+\draw [arrow](start) -- (in1);
+\draw [arrow](in1) -- (pro1);
+\draw [arrow](pro1) -- (dec1);
+\draw [arrow](dec1) -- (pro2a);
+\draw [arrow](dec1) -- (pro2b);
+\draw [arrow](dec1) -- node[anchor=east] &#123;yes&#125; (pro2a);
+\draw [arrow](dec1) -- node[anchor=south] &#123;no&#125; (pro2b);
+\draw [arrow](pro2b) |- (pro1);
+\draw [arrow](pro2a) -- (out1);
+\draw [arrow](out1) -- (stop);
+\end&#123;tikzpicture&#125;
+\end&#123;document&#125;</code></pre>
+<p>以上代码编译结果如图</p>
+<p><img src="/img/flowchart2.jpg" alt="flowchart2.jpg"></p>
+<h2 id="方法比较"><a href="#方法比较" class="headerlink" title="方法比较"></a>方法比较</h2><p>比较两个方法的代码可知，相比使用 flowchart 宏包，直接使用 Ti<em>k</em>Z 绘制流程图多了定义基本形状一步。但通过 Ti<em>k</em>Z 自己定义基本形状，流程图的可定制性更好，可以根据具体需要，定义多种流程图形状。另外一个使用 flowchart 宏包来绘制，最终还是需要用到 Ti<em>k</em>Z 语法，也不见得有多简单。因此，推荐使用 Ti<em>k</em>Z 直接绘制流程图。另外，在很久之间，还有一个名为 nassflow 的宏包也可以实现流程图的绘制，但在目前的几个留下的 LaTeX 的发行版中，都没有预装该宏包，因此，在这里也就不做说明了。</p>
+<p><img src="/img/in-parise-doubt.jpg" alt="In-Praise-Doubt"></p>
+
+    </div>
+
+    
+    
+    
+      
+  <div class="popular-posts-header">相关文章</div>
+  <ul class="popular-posts">
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\archives\588652e8.html" rel="bookmark">如何在 LaTeX 文档中包含 Matlab 代码</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\archives\66d6b47.html" rel="bookmark">将 Matlab 图形嵌入 LaTeX 文档</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\archives\17d5c709.html" rel="bookmark">LaTeX中绘制分形图形</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\archives\d8c3e7ac.html" rel="bookmark">如何在LaTeX中关联多幅图像</a></div>
+    </li>
+  </ul>
+
+
+    <footer class="post-footer">
+          <div class="reward-container">
+  <div>Buy me a coffee</div>
+  <button onclick="document.querySelector('.post-reward').classList.toggle('active');">
+    赞赏
+  </button>
+  <div class="post-reward">
+      <div>
+        <img src="/images/wechatpay.png" alt="三流先生 微信">
+        <span>微信</span>
+      </div>
+      <div>
+        <img src="/images/alipay.png" alt="三流先生 支付宝">
+        <span>支付宝</span>
+      </div>
+
+  </div>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/LaTeX/" rel="tag"># LaTeX</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/archives/465ce6f0.html" rel="prev" title="信仰的中庸之道——疑之颂">
+                  <i class="fa fa-chevron-left"></i> 信仰的中庸之道——疑之颂
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/archives/786c8fc.html" rel="next" title="女士品茶——统计学外传">
+                  女士品茶——统计学外传 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      const activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      const commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 2011 – 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">三流先生</span>
+</div>
+<div class="wordcount">
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-line"></i>
+    </span>
+      <span>站点总字数：</span>
+    <span title="站点总字数">214k</span>
+  </span>
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span>站点阅读时长 &asymp;</span>
+    <span title="站点阅读时长">3:15</span>
+  </span>
+</div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="//cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+
+
+  <script async src="/js/fireworks.js"></script>
+
+
+
+
+  <script src="/js/activate-power-mode.min.js"></script>
+  <script>
+    POWERMODE.colorful = true;
+    POWERMODE.shake = false;
+    document.body.addEventListener('input', POWERMODE);
+  </script>
+
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"log":false,"model":{"jsonPath":"/live2dw/assets/miku.model.json"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":true},"react":{"opacity":0.7}});</script></body>
+</html>

@@ -1,0 +1,1013 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="https://fonts.loli.net/css?family=Lato:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.1/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css">
+
+<script class="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"wangmurong.org.cn","root":"/","images":"/images","scheme":"Pisces","version":"8.0.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}};
+  </script>
+<meta name="description" content="梯度下降算法是目前神经网络中最流行的优化算法。同时也是目前每个深度学习框架中都包含了各种各样的优化的优化梯度下降算法(例如:lasagne,caffe和keras)。然而始终者通常对这些优化算法的优缺点并不了解，他们只是作为黑盒子提供给用户使用。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="梯度下降算法综述">
+<meta property="og:url" content="http://wangmurong.org.cn/archives/91dfa34a.html">
+<meta property="og:site_name" content="风陵渡">
+<meta property="og:description" content="梯度下降算法是目前神经网络中最流行的优化算法。同时也是目前每个深度学习框架中都包含了各种各样的优化的优化梯度下降算法(例如:lasagne,caffe和keras)。然而始终者通常对这些优化算法的优缺点并不了解，他们只是作为黑盒子提供给用户使用。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://wangmurong.org.cn/gallery/sgd_fluctuation.png">
+<meta property="og:image" content="http://wangmurong.org.cn/gallery/without_momentum.gif">
+<meta property="og:image" content="http://wangmurong.org.cn/gallery/with_momentum.gif">
+<meta property="article:published_time" content="2017-04-18T00:00:00.000Z">
+<meta property="article:modified_time" content="2020-11-25T03:52:19.772Z">
+<meta property="article:author" content="三流先生">
+<meta property="article:tag" content="翻译">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://wangmurong.org.cn/gallery/sgd_fluctuation.png">
+
+
+<link rel="canonical" href="http://wangmurong.org.cn/archives/91dfa34a.html">
+
+
+<script class="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+<title>梯度下降算法综述 | 风陵渡</title>
+  
+
+
+
+  <noscript>
+  <style>
+  body { margin-top: 2rem; }
+
+  .use-motion .menu-item,
+  .use-motion .sidebar,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header {
+    visibility: visible;
+  }
+
+  .use-motion .header,
+  .use-motion .site-brand-container .toggle,
+  .use-motion .footer { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle,
+  .use-motion .custom-logo-image {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line {
+    transform: scaleX(1);
+  }
+
+  .search-pop-overlay, .sidebar-nav { display: none; }
+  .sidebar-panel { display: block; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="风陵渡" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">风陵渡</h1>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">且趁闲身未老，须放我些子疏狂</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-gallery">
+
+    <a href="/gallery/" rel="section"><i class="fa fa-camera fa-fw"></i>图集</a>
+
+  </li>
+        <li class="menu-item menu-item-movies">
+
+    <a href="/movies/" rel="section"><i class="fa fa-film fa-fw"></i>观影</a>
+
+  </li>
+        <li class="menu-item menu-item-books">
+
+    <a href="/books/" rel="section"><i class="fa fa-book fa-fw"></i>阅读</a>
+
+  </li>
+        <li class="menu-item menu-item-whisper">
+
+    <a href="/whisper/" rel="section"><i class="fa fa-sticky-note fa-fw"></i>碎笔</a>
+
+  </li>
+        <li class="menu-item menu-item-excert">
+
+    <a href="/excert/" rel="section"><i class="fa fa-feather-alt fa-fw"></i>摘抄</a>
+
+  </li>
+        <li class="menu-item menu-item-favorite">
+
+    <a href="/favorite/" rel="section"><i class="fa fa-star fa-fw"></i>收藏</a>
+
+  </li>
+        <li class="menu-item menu-item-tools">
+
+    <a href="/tools/" rel="section"><i class="fa fa-tools fa-fw"></i>工具</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <section class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A2%AF%E5%BA%A6%E4%B8%8B%E9%99%8D%E7%AE%97%E6%B3%95%E5%88%86%E7%B1%BB"><span class="nav-number">1.</span> <span class="nav-text">梯度下降算法分类</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%89%B9%E6%A2%AF%E5%BA%A6%E4%B8%8B%E9%99%8D%E7%AE%97%E6%B3%95-Batch-Gradient-Descent"><span class="nav-number">1.1.</span> <span class="nav-text">批梯度下降算法(Batch Gradient Descent)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%9A%8F%E6%9C%BA%E6%A2%AF%E5%BA%A6%E4%B8%8B%E9%99%8D%E7%AE%97%E6%B3%95-Stochastic-Gradient-Descent"><span class="nav-number">1.2.</span> <span class="nav-text">随机梯度下降算法(Stochastic　Gradient Descent)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BF%B7%E4%BD%A0%E6%89%B9%E6%A2%AF%E5%BA%A6%E4%B8%8B%E9%99%8D-Mini-Batch-Gradient-Descent"><span class="nav-number">1.3.</span> <span class="nav-text">迷你批梯度下降(Mini-Batch Gradient Descent)</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8C%91%E6%88%98"><span class="nav-number">2.</span> <span class="nav-text">挑战</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%9A%8F%E6%9C%BA%E4%B8%8B%E9%99%8D%E4%BC%98%E5%8C%96%E7%AE%97%E6%B3%95"><span class="nav-number">3.</span> <span class="nav-text">随机下降优化算法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8A%A8%E9%87%8F-Momentum"><span class="nav-number">3.1.</span> <span class="nav-text">动量(Momentum)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Adagrad"><span class="nav-number">3.2.</span> <span class="nav-text">Adagrad</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Adadelta"><span class="nav-number">3.3.</span> <span class="nav-text">Adadelta</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#RMSprop"><span class="nav-number">3.4.</span> <span class="nav-text">RMSprop</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Adam"><span class="nav-number">3.5.</span> <span class="nav-text">Adam</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BC%98%E5%8C%96%E8%BF%87%E7%A8%8B%E5%8F%AF%E8%A7%86%E5%8C%96"><span class="nav-number">3.6.</span> <span class="nav-text">优化过程可视化</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%80%89%E7%94%A8%E4%BB%80%E4%B9%88%E4%BC%98%E5%8C%96%E7%AE%97%E6%B3%95"><span class="nav-number">3.7.</span> <span class="nav-text">选用什么优化算法</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B9%B6%E8%A1%8C%E5%92%8C%E5%88%86%E5%B8%83%E5%BC%8FSGD"><span class="nav-number">4.</span> <span class="nav-text">并行和分布式SGD</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Hogwild"><span class="nav-number">4.1.</span> <span class="nav-text">Hogwild</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Downpour-SGD"><span class="nav-number">4.2.</span> <span class="nav-text">Downpour SGD</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Delay-tolerant-Algorithms-for-SGD"><span class="nav-number">4.3.</span> <span class="nav-text">Delay-tolerant Algorithms for SGD</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#TensorFlow"><span class="nav-number">4.4.</span> <span class="nav-text">TensorFlow</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Elastic-Averaging-SGD"><span class="nav-number">4.5.</span> <span class="nav-text">Elastic Averaging SGD</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%B6%E4%BB%96%E4%BC%98%E5%8C%96%E7%AD%96%E7%95%A5"><span class="nav-number">5.</span> <span class="nav-text">其他优化策略</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B4%97%E7%89%8C%E5%92%8C%E8%AF%BE%E7%A8%8B%E5%AD%A6%E4%B9%A0-Shuffling-and-Curriculum-Learning"><span class="nav-number">5.1.</span> <span class="nav-text">洗牌和课程学习(Shuffling and Curriculum Learning)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%89%B9%E9%87%8F%E5%BD%92%E4%B8%80%E5%8C%96-Batch-normalization"><span class="nav-number">5.2.</span> <span class="nav-text">批量归一化(Batch normalization)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B0%BD%E6%97%A9%E5%81%9C%E6%AD%A2-Early-stopping"><span class="nav-number">5.3.</span> <span class="nav-text">尽早停止(Early stopping)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A2%AF%E5%BA%A6%E5%99%AA%E5%A3%B0-Gradient-noise"><span class="nav-number">5.4.</span> <span class="nav-text">梯度噪声(Gradient noise)</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BB%93%E8%AE%BA"><span class="nav-number">6.</span> <span class="nav-text">结论</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%87%B4%E8%B0%A2"><span class="nav-number">7.</span> <span class="nav-text">致谢</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%89%93%E5%8D%B0%E7%89%88%E6%9C%AC%E5%BC%95%E7%94%A8"><span class="nav-number">8.</span> <span class="nav-text">打印版本引用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BF%BB%E8%AF%91"><span class="nav-number">9.</span> <span class="nav-text">翻译</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E6%96%87%E7%8C%AE"><span class="nav-number">10.</span> <span class="nav-text">参考文献</span></a></li></ol></div>
+        </section>
+        <!--/noindex-->
+
+        <section class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="三流先生"
+      src="/images/codercat.jpg">
+  <p class="site-author-name" itemprop="name">三流先生</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">125</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">24</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/latexers" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;latexers" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i></a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:murongwang@outlook.com.com" title="E-Mail → mailto:murongwang@outlook.com.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i></a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/atom.xml" title="Rss → &#x2F;atom.xml"><i class="fa fa-rss fa-fw"></i></a>
+      </span>
+  </div>
+
+
+
+    <div class="links-of-blogroll motion-element links-of-blogroll-block">
+      <div class="links-of-blogroll-title">
+        <!-- modify icon to fire by szw -->
+        <i class="fa fa-history fa-" aria-hidden="true"></i>
+        近期文章
+      </div>
+      <ul class="links-of-blogroll-list">
+        
+        
+          <li>
+            <a href="/archives/4998123a.html" title="且慢，前面听说风很大" target="_blank">且慢，前面听说风很大</a>
+          </li>
+        
+          <li>
+            <a href="/archives/e25d1b6d.html" title="泯灭之路——大屠杀之根源、历史与余波" target="_blank">泯灭之路——大屠杀之根源、历史与余波</a>
+          </li>
+        
+          <li>
+            <a href="/archives/f47cb09a.html" title="羊城两周记" target="_blank">羊城两周记</a>
+          </li>
+        
+          <li>
+            <a href="/archives/10c90e85.html" title="增强现实显微镜——实时自动癌症检测" target="_blank">增强现实显微镜——实时自动癌症检测</a>
+          </li>
+        
+          <li>
+            <a href="/archives/1994da85.html" title="岁月神偷" target="_blank">岁月神偷</a>
+          </li>
+        
+      </ul>
+    </div>
+
+
+<div style="">
+  <canvas id="canvas" style="width:60%;">当前浏览器不支持canvas，请更换浏览器后再试</canvas>
+</div>
+<script>
+(function(){
+
+   var digit=
+    [
+        [
+            [0,0,1,1,1,0,0],
+            [0,1,1,0,1,1,0],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [0,1,1,0,1,1,0],
+            [0,0,1,1,1,0,0]
+        ],//0
+        [
+            [0,0,0,1,1,0,0],
+            [0,1,1,1,1,0,0],
+            [0,0,0,1,1,0,0],
+            [0,0,0,1,1,0,0],
+            [0,0,0,1,1,0,0],
+            [0,0,0,1,1,0,0],
+            [0,0,0,1,1,0,0],
+            [0,0,0,1,1,0,0],
+            [0,0,0,1,1,0,0],
+            [1,1,1,1,1,1,1]
+        ],//1
+        [
+            [0,1,1,1,1,1,0],
+            [1,1,0,0,0,1,1],
+            [0,0,0,0,0,1,1],
+            [0,0,0,0,1,1,0],
+            [0,0,0,1,1,0,0],
+            [0,0,1,1,0,0,0],
+            [0,1,1,0,0,0,0],
+            [1,1,0,0,0,0,0],
+            [1,1,0,0,0,1,1],
+            [1,1,1,1,1,1,1]
+        ],//2
+        [
+            [1,1,1,1,1,1,1],
+            [0,0,0,0,0,1,1],
+            [0,0,0,0,1,1,0],
+            [0,0,0,1,1,0,0],
+            [0,0,1,1,1,0,0],
+            [0,0,0,0,1,1,0],
+            [0,0,0,0,0,1,1],
+            [0,0,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [0,1,1,1,1,1,0]
+        ],//3
+        [
+            [0,0,0,0,1,1,0],
+            [0,0,0,1,1,1,0],
+            [0,0,1,1,1,1,0],
+            [0,1,1,0,1,1,0],
+            [1,1,0,0,1,1,0],
+            [1,1,1,1,1,1,1],
+            [0,0,0,0,1,1,0],
+            [0,0,0,0,1,1,0],
+            [0,0,0,0,1,1,0],
+            [0,0,0,1,1,1,1]
+        ],//4
+        [
+            [1,1,1,1,1,1,1],
+            [1,1,0,0,0,0,0],
+            [1,1,0,0,0,0,0],
+            [1,1,1,1,1,1,0],
+            [0,0,0,0,0,1,1],
+            [0,0,0,0,0,1,1],
+            [0,0,0,0,0,1,1],
+            [0,0,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [0,1,1,1,1,1,0]
+        ],//5
+        [
+            [0,0,0,0,1,1,0],
+            [0,0,1,1,0,0,0],
+            [0,1,1,0,0,0,0],
+            [1,1,0,0,0,0,0],
+            [1,1,0,1,1,1,0],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [0,1,1,1,1,1,0]
+        ],//6
+        [
+            [1,1,1,1,1,1,1],
+            [1,1,0,0,0,1,1],
+            [0,0,0,0,1,1,0],
+            [0,0,0,0,1,1,0],
+            [0,0,0,1,1,0,0],
+            [0,0,0,1,1,0,0],
+            [0,0,1,1,0,0,0],
+            [0,0,1,1,0,0,0],
+            [0,0,1,1,0,0,0],
+            [0,0,1,1,0,0,0]
+        ],//7
+        [
+            [0,1,1,1,1,1,0],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [0,1,1,1,1,1,0],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [0,1,1,1,1,1,0]
+        ],//8
+        [
+            [0,1,1,1,1,1,0],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [0,1,1,1,0,1,1],
+            [0,0,0,0,0,1,1],
+            [0,0,0,0,0,1,1],
+            [0,0,0,0,1,1,0],
+            [0,0,0,1,1,0,0],
+            [0,1,1,0,0,0,0]
+        ],//9
+        [
+            [0,0,0,0,0,0,0],
+            [0,0,1,1,1,0,0],
+            [0,0,1,1,1,0,0],
+            [0,0,1,1,1,0,0],
+            [0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0],
+            [0,0,1,1,1,0,0],
+            [0,0,1,1,1,0,0],
+            [0,0,1,1,1,0,0],
+            [0,0,0,0,0,0,0]
+        ]//:
+    ];
+
+var canvas = document.getElementById('canvas');
+
+if(canvas.getContext){
+    var cxt = canvas.getContext('2d');
+    //声明canvas的宽高
+    var H = 100,W = 700;
+    canvas.height = H;
+    canvas.width = W;
+    cxt.fillStyle = '#f00';
+    cxt.fillRect(10,10,50,50);
+
+    //存储时间数据
+    var data = [];
+    //存储运动的小球
+    var balls = [];
+    //设置粒子半径
+    var R = canvas.height/20-1;
+    (function(){
+        var temp = /(\d)(\d):(\d)(\d):(\d)(\d)/.exec(new Date());
+        //存储时间数字，由十位小时、个位小时、冒号、十位分钟、个位分钟、冒号、十位秒钟、个位秒钟这7个数字组成
+        data.push(temp[1],temp[2],10,temp[3],temp[4],10,temp[5],temp[6]);
+    })();
+
+    /*生成点阵数字*/
+    function renderDigit(index,num){
+        for(var i = 0; i < digit[num].length; i++){
+            for(var j = 0; j < digit[num][i].length; j++){
+                if(digit[num][i][j] == 1){
+                    cxt.beginPath();
+                    cxt.arc(14*(R+2)*index + j*2*(R+1)+(R+1),i*2*(R+1)+(R+1),R,0,2*Math.PI);
+                    cxt.closePath();
+                    cxt.fill();
+                }
+            }
+        }
+    }
+
+    /*更新时钟*/
+    function updateDigitTime(){
+        var changeNumArray = [];
+        var temp = /(\d)(\d):(\d)(\d):(\d)(\d)/.exec(new Date());
+        var NewData = [];
+        NewData.push(temp[1],temp[2],10,temp[3],temp[4],10,temp[5],temp[6]);
+        for(var i = data.length-1; i >=0 ; i--){
+            //时间发生变化
+            if(NewData[i] !== data[i]){
+                //将变化的数字值和在data数组中的索引存储在changeNumArray数组中
+                changeNumArray.push(i+'_'+(Number(data[i])+1)%10);
+            }
+        }
+        //增加小球
+        for(var i = 0; i< changeNumArray.length; i++){
+            addBalls.apply(this,changeNumArray[i].split('_'));
+        }
+        data = NewData.concat();
+    }
+
+    /*更新小球状态*/
+    function updateBalls(){
+        for(var i = 0; i < balls.length; i++){
+            balls[i].stepY += balls[i].disY;
+            balls[i].x += balls[i].stepX;
+            balls[i].y += balls[i].stepY;
+            if(balls[i].x > W + R || balls[i].y > H + R){
+                balls.splice(i,1);
+                i--;
+            }
+        }
+    }
+
+    /*增加要运动的小球*/
+    function addBalls(index,num){
+        var numArray = [1,2,3];
+        var colorArray =  ["#3BE","#09C","#A6C","#93C","#9C0","#690","#FB3","#F80","#F44","#C00"];
+        for(var i = 0; i < digit[num].length; i++){
+            for(var j = 0; j < digit[num][i].length; j++){
+                if(digit[num][i][j] == 1){
+                    var ball = {
+                        x:14*(R+2)*index + j*2*(R+1)+(R+1),
+                        y:i*2*(R+1)+(R+1),
+                        stepX:Math.floor(Math.random() * 4 -2),
+                        stepY:-2*numArray[Math.floor(Math.random()*numArray.length)],
+                        color:colorArray[Math.floor(Math.random()*colorArray.length)],
+                        disY:1
+                    };
+                    balls.push(ball);
+                }
+            }
+        }
+    }
+
+    /*渲染*/
+    function render(){
+        //重置画布宽度，达到清空画布的效果
+        canvas.height = 100;
+        //渲染时钟
+        for(var i = 0; i < data.length; i++){
+            renderDigit(i,data[i]);
+        }
+        //渲染小球
+        for(var i = 0; i < balls.length; i++){
+            cxt.beginPath();
+            cxt.arc(balls[i].x,balls[i].y,R,0,2*Math.PI);
+            cxt.fillStyle = balls[i].color;
+            cxt.closePath();
+            cxt.fill();
+        }
+    }
+
+    clearInterval(oTimer);
+    var oTimer = setInterval(function(){
+        //更新时钟
+        updateDigitTime();
+        //更新小球状态
+        updateBalls();
+        //渲染
+        render();
+    },50);
+}
+
+})();
+</script>
+        </section>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://wangmurong.org.cn/archives/91dfa34a.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/codercat.jpg">
+      <meta itemprop="name" content="三流先生">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="风陵渡">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          梯度下降算法综述
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2017-04-18 00:00:00" itemprop="dateCreated datePublished" datetime="2017-04-18T00:00:00Z">2017-04-18</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2020-11-25 03:52:19" itemprop="dateModified" datetime="2020-11-25T03:52:19Z">2020-11-25</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E7%A0%94%E7%A9%B6/" itemprop="url" rel="index"><span itemprop="name">研究</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+<div class="translate-style">
+繁/简：<a id="translateLink" href="javascript:translatePage();">繁体
+</a>
+</div>
+<script type="text/javascript" src="/js/tw_cn.js"></script>
+<script type="text/javascript">
+var defaultEncoding = 2; //网站编写字体是否繁体，1-繁体，2-简体
+var translateDelay = 0; //延迟时间,若不在前, 要设定延迟翻译时间, 如100表示100ms,默认为0
+var cookieDomain = "https://tding.top/"; //Cookie地址, 一定要设定, 通常为你的网址
+var msgToTraditionalChinese = "繁体"; //此处可以更改为你想要显示的文字
+var msgToSimplifiedChinese = "简体"; //同上，但两处均不建议更改
+var translateButtonId = "translateLink"; //默认互换id
+translateInitilization();
+</script>
+
+
+      </div>
+      <div class="post-meta">
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>14k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>13 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <p>梯度下降算法是目前神经网络中最流行的优化算法。同时也是目前每个深度学习框架中都包含了各种各样的优化的优化梯度下降算法(例如:<a target="_blank" rel="noopener" href="http://lasagne.readthedocs.org/en/latest/modules/updates.html">lasagne</a>,<a target="_blank" rel="noopener" href="http://caffe.berkeleyvision.org/tutorial/solver.html">caffe</a>和<a target="_blank" rel="noopener" href="http://keras.io/optimizers/">keras</a>)。然而始终者通常对这些优化算法的优缺点并不了解，他们只是作为黑盒子提供给用户使用。<a id="more"></a></p>
+<p>本文旨在介绍不同的梯度下降优化算法的不同点以帮助你更好的使用这些算法。我们首先介绍了不同种类的梯度下降算法。然后我们简要的对梯度下降算法面临的挑战进行了总结。接下来，我们介绍了应对梯度下降算法当前面临挑战的常用优化算法。我们夜对梯度下降算法并行和分布式架构进行了简要的介绍。最后，我们还指出了其他一些梯度下降算法的优化策略。</p>
+<p>梯度下降算法是最小化参数为$\theta$的目标函数$J(\theta)$的方法。在梯度下降中通常通过更新与梯度相反方向的参数来实现目标函数的优化。学习率$\eta$决定了梯度下降的步伐大小。换句话说，我们沿着平面的梯度下山知道我们到达到一个山谷。如果你对梯度下降算法不太熟悉，你可以在<a target="_blank" rel="noopener" href="http://cs231n.github.io/optimization-1/">这里</a>找到关于梯度下降在优化神经网络中的详细介绍。</p>
+<h2 id="梯度下降算法分类"><a href="#梯度下降算法分类" class="headerlink" title="梯度下降算法分类"></a>梯度下降算法分类</h2><p>梯度下降算法根据用来计算目标函数梯度数据数量的不同可以分为三类。根据数据规模的大小我们对参数更新的精确度和更新所用时间之间的趋势线。</p>
+<h3 id="批梯度下降算法-Batch-Gradient-Descent"><a href="#批梯度下降算法-Batch-Gradient-Descent" class="headerlink" title="批梯度下降算法(Batch Gradient Descent)"></a>批梯度下降算法(Batch Gradient Descent)</h3><p>Vanilla梯度下降和Aka批梯度下降算法通过所有训练样本来计算目标函数的梯度，参数更新公式如下：<br>$$\theta = \theta - \eta\cdot \Delta_{\theta}J(\theta)$$<br>由于在批梯度下降算法中每次参数更新需要计算所有数据集的梯度，批梯度下降算法速度会十分缓慢，在数据集太大不能一次读入内存的时候会更加麻烦。批梯度下降算法不能保证在每个新样本来的时候对模型进行更新。<br>批梯度下降算法的伪代码如下:</p>
+<pre><code>for i in range(nb_epochs):
+    params_grad = evaluate_gradient(loss_function, data, params)
+    params = params - learning_rate * params_grad</code></pre>
+<p>在预定的迭代时间内，首先利用假定的目标函数的参数$params$和所有的训练样本计算目标函数的梯度向量 $params_grad$。值得注意的是目前所有的深度学习的库都提供了关于某些参数的梯度的改进计算方法。如果你打算自己计算梯度，梯度检验是个不错的注意(具体可以看<a target="_blank" rel="noopener" href="http://cs231n.github.io/neural-networks-3/">这里</a>提供了一些梯度检验的技巧)。</p>
+<p>计算得到目标函数的梯度后，根据梯度方向和学习率更新更新参数。批处理梯度下降在凸平面上能收敛到全局最优，在非凸平面上能够收敛到局部最优。</p>
+<h3 id="随机梯度下降算法-Stochastic-Gradient-Descent"><a href="#随机梯度下降算法-Stochastic-Gradient-Descent" class="headerlink" title="随机梯度下降算法(Stochastic　Gradient Descent)"></a>随机梯度下降算法(Stochastic　Gradient Descent)</h3><p>与批梯度下降算法相反，随机梯度下降算法会对每个样本　$x^{(i)}$和标签$y^{(i)}$更新参数,更新公式如下:</p>
+<p>$$\theta = \theta - \eta \cdot \Delta_{\theta}J(\theta;x^{(i)};y^{(i)})$$</p>
+<p>批梯度下降算法在每次参数更新时都需要对数据集中所有样本重新计算。随机梯度下降算法通过每次选取一个样本更新参数来避免这种计算冗余。它通常比BSG速度更快，可以用于在线场景。SGD由于频繁的更新会导致参数变化大，从而引起目标函数值会波动的非常厉害，如图１所示。</p>
+<p><img src="/gallery/sgd_fluctuation.png" alt="图1:随机梯度波动图([原图](https://upload.wikimedia.org/wikipedia/commons/f/f3/Stogra.png))"></p>
+<h3 id="迷你批梯度下降-Mini-Batch-Gradient-Descent"><a href="#迷你批梯度下降-Mini-Batch-Gradient-Descent" class="headerlink" title="迷你批梯度下降(Mini-Batch Gradient Descent)"></a>迷你批梯度下降(Mini-Batch Gradient Descent)</h3><p>Mini梯度下降算法综合结合了批梯度下降和随机梯度下降的优点，每次利用样本集中的$n$个样本来更新梯度下降的参数，更新公式如下：<br>$$\theta=\theta - \eta\cdot\Delta_{\theta}J(\theta;x^{(i:i+n)};y^{(i:i+n)})$$<br>通过选取部分样本来更新参数，Mini批梯度下降算法具有以下优点:<br>a) 可以减小参数更新过程中的波动，这能够确保优化过程更加稳定的收敛；<br>b) 能够像当前的深度学习框架中那样利用矩阵优化来计算目标函数梯度那样高校。通常Mini批梯度下降算法的尺寸为50和２５６，但是根据应用的不同可以变化。Mini梯度下降算法是深度学习中最为常用的优化算法。即使有些网络训练中使用了Mini批梯度下降算法，但可能还是采用了SGD来进行描述。注意:在后文中我们描述SGD时为了简洁，省略了参数$x^{(i:i+n)};y^{(i:i+n)}$.</p>
+<p>Mini-Batch的伪代码如下:</p>
+<pre><code>for i in range(nb_epochs):
+    np.random.shuffle(data)
+    for batch in get_batches(data, batch_size=50):
+    params_grad = evaluate_gradient(loss_function, batch, params)
+    params = params - learning_rate * params_grad</code></pre>
+<h2 id="挑战"><a href="#挑战" class="headerlink" title="挑战"></a>挑战</h2><p>虽说 Mini-Batch梯度下降算法已经得到了广泛的应用，但是它并不能保证很好的收敛性，并且还有一些重要的挑战需要强调:</p>
+<ul>
+<li>选择合适的学习率比较困难。当学习率太小时，目标函数收敛太慢，当学习率太大又容易造成目标函数值在最小值附近波动，甚至跳出收敛区域。</li>
+<li>学习率更新计划[11]试图通过诸如蚁群算法或者预先定义的更新策略或者当迭代特定次数后。这些更新计划和阈值的定义应当更加高级，不能根据数据集的特点进行自适应。</li>
+<li>另外，对所有的参数使用同样的学习率夜又问题　。如果当我们的数据是稀疏的或者频率不同，我们或许不想所有的参数用同样的学习率更新，而需要对一些稀有的特征采用更大的更新参数。</li>
+<li>另外一个重要的挑战是对于优化非凸函数时容易陷入局部最优中。Dauphin指出局部最优的困难不是由于局部最小区域而是由于鞍点的存在，即一维是上升的，而另一维是下降的。鞍点周围通常是错误率相同的稳定状态点，这使得SGD算法很难跳出局部最优，因为它在所有的维度上都接近与等于０。</li>
+</ul>
+<h2 id="随机下降优化算法"><a href="#随机下降优化算法" class="headerlink" title="随机下降优化算法"></a>随机下降优化算法</h2><p>接下来，我们对深度学习社区中用来应对上文提到的挑战的一些常用算法。我们不会讨论那些不适用于高阶数据优化的算法，比方说二阶方法，如<a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Newton%27s_method_in_optimization">牛顿法</a>。</p>
+<h3 id="动量-Momentum"><a href="#动量-Momentum" class="headerlink" title="动量(Momentum)"></a>动量(Momentum)</h3><p>SGD算法容易在平面的凹处陷入麻烦，即:平面上的曲线在一边比另一边陡峭很多[1],这就是我们通常所说的局部最优。在这种情况下，SGD在凹底处震荡，然后缓慢的得到了如图二所示的局部最优解。<br><img src="/gallery/without_momentum.gif" alt="图2:无动量SGD"><br><img src="/gallery/with_momentum.gif" alt="图３:动量SGD"><br>动量(Momentum)[2]是一种加速SGD算法向相关方向下降，并且避免震荡的方法，如图３所示。它通过对上一步更新向量增加一个小数$\gamma$来更新当前的向量来实现加速和避免震荡,具体数学式如下:<br>$$v_t = \gamma v_{t-1} + \eta \nabla_\theta J( \theta)$$</p>
+<p>$$\theta = \theta - v_t$$</p>
+<p>注意:在一些实现中改变了等式中的符号，动量项中$\gamma$通常设微$0.9$或相似的值。本质上当采用动量法时可以想象成我们推一个球下山。随着球的向下滚动，它的动量增加，从而滚动的速度越来越快(直到它到达终止速度，如果又空气阻力存在，即$\gamma&lt;1$)。在参数更新时情况夜类似：动量项能够增加梯度方向一致点的动量并且减小梯度方向改变维的动量。因此，我们能够保证函数能够收敛的更快，并且减小震荡。</p>
+<p>Nesterov 加速梯度<br>如果一个球沿着山坡随意往下滚，那么得到的结果肯定不满意。那么我们可以有一个更智能的小球，这个小球可以知道它在坡道再次变陡之前减速。</p>
+<p>Nesterov加速梯度算法(NAG)[7]为我们提供了这种智能动量。我们知道在我们使用动量项 $\gamma v_{t-1}$ 来更新参数$\theta$。通过计算 $\theta -\gamma v_{t-1}$ 可以帮助我们估计下一次参数的大概更新位置(梯度不能整体更新)。我们可以通过计算当前的梯度即利用当前的参数来计算将来参数的位置，更新数学式如下：</p>
+<p>$$v_t = \gamma v_{t-1} + \eta \nabla_\theta J( \theta - \gamma v_{t-1} )$$</p>
+<p>$$\theta = \theta - v_t$$<br>同样，我们将$\gamma$的值近似的设为$0.9$. Momentum首先计算当前的梯度 (如图４中蓝色向量所示) 然后在当前方向进行一个较大幅度的梯度更新 (如途中长的蓝色向量所示) 。而NAG首先进行一个较大幅度的梯度更新 (图中棕色向量)，然后在调整梯度方向(红色向量)，最终的梯度更新如图中绿色向量所示。这种更新方式能够避免更新过快从而提高结果的响应能力，这种方式在提高RNN训练性能中具有重要的作用[8]。<br>在以上的方法中我们能够根据代价函数当前梯度的情况来自适应的更新梯度从而加快梯度下降算法的收敛速度，我们也可以根据各个参数的重要性来对参数进行自适应的更新。</p>
+<h3 id="Adagrad"><a href="#Adagrad" class="headerlink" title="Adagrad"></a>Adagrad</h3><p>Adagrad[3] 就是这样一种梯度下降优化算法：它对每个参数的采用不同的学习率，需要频繁更新的参数学习率更大，而更新不那么频繁的参数学习率更小。Adagrad的这一特性使得它使用于稀疏数据的处理。Dean等人[4]发现Adagrad在训练大规模神经网络中能够提高网络的鲁棒性，如在谷歌训练从Youtube视频中识别猫的项目。另外，Penningto et al.[5]采用Adagrad来训练GloVe词向量构建网络，在该网络中，与频繁词相比非频繁单词在更新网络时需要更新幅度更大。首先，我们对参数集 $\Theta$ 中的每个参数 $\theta_{i}$ 采用相同的学习率 $\eta$ 进行更新。Adagrad在 $t$ 时刻对每个参数 $\theta_{i}$ 采用不同的学习率进行更新，我们首先说明Adagrad对每个参数的更新，之后我们再向量化。为了简洁，我们设 $g_{t,i}$ 是目标函数在 $T$ 时刻的梯度函数:</p>
+<p>$$g_{t,i} = \Delta_{\theta}J(\theta_{i})$$</p>
+<p>SGD在$t$时刻按照以下公式对参数进行更新:</p>
+<p>$$\theta_{t+1,i} = \theta_{t,i} - \eta\cdot g_{t,i}$$</p>
+<p>上式就是梯度更新准则，Adagrad 在每个时刻 $t$ 都更具过去的梯度对每个参数 $\theta_{i}$ 的学习率进行更新，参数的恶搞拿下方式如下:</p>
+<p>$$\theta_{t+1,i} = \theta_{t,i} - \frac{\eta}{\sqrt{G_{t,ii} + \epsion}}\cdot g_{t,i}$$</p>
+<p>其中 $G_{t} \in R^{d\times d}$ 在这里是一个对角矩阵，每个元素 $i,i$是参数 $\theta_{i}$ 的平方根 [24], $\epison$ 是一个避免参数为 $0$ 的平滑项(通常设为 $1e-8$ ).有趣的是，没有平方根操作的化，该算法表现的十分差。由于 $G_{t}$ 包含了所有过去梯度关于参数 $\theta$ 的平方根的和。所以我们可以通过元素之间 $G_{t}$和$g_{t}$ 的点乘来实现向量化：</p>
+<p>$$\theta_{t+1} = \theta_{t} - \frac{\eta}{\sqrt{G_{t} + \epsion}}g_{t}$$</p>
+<p>Adagrad算法的主要优点是不需要手动的设定学习率了。大多数的实现都采用$0.01$作为默认的学习率。Adagrad 算法的一个缺点是他将分母中所有的项相加，由于每项都为正，累加和在训练过程中会随着时间的变化而增加。这会导致学习率缩小，最后导致网络不能学习到更多的内容了。下面这种优化算法主要就是为了解决这一问题而提出的。</p>
+<h3 id="Adadelta"><a href="#Adadelta" class="headerlink" title="Adadelta"></a>Adadelta</h3><p>Adadelta[6]算法是Adagrad算法的一个扩展，它主要用来解决累加和变大导致学习率缩小的问题。<br>它通过累加固定窗口$w$大小的梯度来替代所有梯度的累加。</p>
+<p>为了避免存储过去$w$梯度值的低效性，梯度和被定义为递归的延迟平均。时间$t$时的梯度平均只取悦与前<br>次的平均和当前的梯度</p>
+<p>$$E[g^2]<em>{t} = \gamma E[g^2]</em>{t-1} + (1-\gamma)g_{t}^2$$<br>同样我们将$\gamma$设为$0.9$. 为了清晰，我们现在重写SGD的参数更新方程:</p>
+<p>$$\Detla \theta_{t} = -\eta \cdot g_{t,i}$$</p>
+<p>$$\theta_{t+1} = \theta_{t} + \Detla \theta_{t}$$</p>
+<p>Adadelta的参数向量更新式如下:</p>
+<p>$$\Detla \theta_{t} = - \frac{\eta}{\sqrt{G_{t} + \epsion}g_{t}}$$</p>
+<p>同样，对角矩阵$G_{t}$可以通过延迟平均$E[g^2]_{t}$来代替:</p>
+<p>$$\Detla \theta_{t} = -\frac{\eta}{E[g^2]<em>{t}+\epsion}g</em>{t}$$<br>由于分母是根的平方根，所以我们可以用以下缩写来替代:</p>
+<p>$$\Detla = -\frac{\eta}{RMS[g]<em>{t}}g</em>{t}.$$</p>
+<p>作者注意到这个更新单元与实际上不匹配，即参数更新单元要和假设相匹配。为了实现这李，他们首先<br>定义了另一种指数延迟，在这式中没有对梯度求平凡跟，但是对梯度更新的参数求平方根，式子如下:</p>
+<p>$$RMS[\Detla \theta]<em>{t} = \sqrt{E[\Detla \theta^2]</em>{t} + \epsion}$$</p>
+<p>由于$RMS[\Detla]_{t}$未知，所以我们将它用RMS的参数近似，直到更新。通过用前一步的<br>更新规则来替代学习率，最后Adadelta的更新规则如下:</p>
+<p>$$\Detla\theta_{t} = -\frac{RMS[\Delta\theta]<em>{t-1}{RMS[g]</em>{t}}g_{t}.$$</p>
+<p>在Adadelta中，我们不需要设置默认的学习率，因为它可以从更新规则中计算得到。</p>
+<h3 id="RMSprop"><a href="#RMSprop" class="headerlink" title="RMSprop"></a>RMSprop</h3><p>RMSprop是一种未公开发表的一种自适应学习率更新方法，它由Geoff Hinton在Coursera的课程中<br>提出。<br>RMSprop和Adadelta都是用来解决Adagrad’s学习率增长的问题。RMSprop在实际上<br>定义了我们上文提到的Adadelta:</p>
+<p>$$E[g^2]<em>{t} = 0.9E[g^2]</em>{t-1} + 0.1g_{t}^2$$</p>
+<p>$$\theta_{t-1} = \theta_{t} - \frac{\eta}{\sqrt{E[g^2]<em>{t} + \epsion}}g</em>{t}.$$</p>
+<p>RMS也同样用延迟收敛除以学习率。Hinton建议$\gamma$值设置微$0.9$.$\eta$的默认值建议值为$0.001$.</p>
+<h3 id="Adam"><a href="#Adam" class="headerlink" title="Adam"></a>Adam</h3><p>Adam(Adaptive Moment Estimation)[15]是另一种为每个参数自适应计算学习率的方法。<br>除了像Adadelta和RMSprop存储了过去的推迟收敛稀疏 $v_{t}$ 外，Adam 还存储了过去$m_{t}$ 的参数，与 Momentum 类似：</p>
+<p>$$m_{t} = \beta_{1}m_{t-1} + (1-\beta_{1})g_{t}.$$</p>
+<p>$$v_{t} = \beta_{2}v_{t-1} + (1-\beta_{2})g_{t}^2$$</p>
+<p>其中$m_{t}$和$v_{t}$分别是第一时刻和第二时刻梯度的估计值。由于$m_{t}$和$<br>被初始化为$o’s$ 本文作者发现他们会像$0$靠近，特别是在初始化步骤并且延迟率特别小时(即$\beta_{1}$和$\beta_{2}$接近１时).</p>
+<p>我们可以通过计算当前的梯度即利用当前的参数来计算将来参数的位置，更新数学式如下：</p>
+<p>$$m_{t} = \frac{m_{t}}{1-\beta_{1}^{t}}$$</p>
+<p>$$v_{t} = \frac{v_{t}}{1-\beta_{2}^{t}}$$</p>
+<p>通过上式即可更新参数，像Adadelta和RMSprop一样，　学习率的更新公式如下：</p>
+<p>$$\theta_{t+1} = \theta_{t} - \frac{\eta}{\sqrt{v_{t}} + \epsion}m_{t}$$</p>
+<p>作者提出$\beta_{1}$和$\beta_{2}$的默认值为$0.999$,$\epsion$的值为$10^{-9}$<br>文中实验表明与其他的自适应算法相比，Adam表现十分优异。</p>
+<h3 id="优化过程可视化"><a href="#优化过程可视化" class="headerlink" title="优化过程可视化"></a>优化过程可视化</h3><p>下面的两张动画图为优化过程提供了直观的认识。我们也可以在这里找到由Karpathy制作的动画。</p>
+<p>在图５中，我们可以看到优化算法在目标函数上曲面上的随着时间的变化过程。需要注意的是，Adagrad,<br>Adadelta　和 RMSprop收敛速度差不多快，而Momentum和NAG像小球一样滚动下降。<br>但是它可以快速的对局部最优值作出反应，因为它增加了对局部最小值的查看。</p>
+<p>在图６中战士了所有算法在鞍点的行为，在只有一个方向梯度为正数，其他所有方向梯度为负数的点。<br>图中指出了SGD算法所面临的局部最优的问题，我们可以看到SGD, Momentum和NAG非常难以跳出局部最优，虽说后两者在之后缓慢的跳出了鞍点，但是Adagrad，RMSprop,和<br>Adadelta可以快速的沿着负梯度下降。</p>
+<p>我们可知，自适应学习率方法如Adagrad, Adadelta, RMSprop和Adam在这些情况下可以提供最好的收敛速度。</p>
+<h3 id="选用什么优化算法"><a href="#选用什么优化算法" class="headerlink" title="选用什么优化算法"></a>选用什么优化算法</h3><p>那么我们该选用哪种优化算法呢？如果你的输入数据是稀疏的，那么你最好选用一种自适应学习率的方法。另外一大优势是自适应方法不需要手动设定学习率，通过设定默认值即可取得最好的训练结果。</p>
+<p>总而言之，RMSprop是Adagrad的一种扩展，主要是用来解决Adag方法中学习率增长的问题。它进一步扩展成<br>Adadelta除了Adadelta使用RMS的参数来更新规则。最后Adam在momentum和RMSprop的基础上增加了偏差修正。在这种情况下Adam, RMSprop, Adadelta方法非常相似。KingMa等[15]证明了偏差修正可以帮助Adam在最后优化时性能比RMSprop更好。在数据稀疏的情况下，Adam是最好的选择。</p>
+<p>有趣的是，在最佳几年的SGD算法中很少有人使用momentum或者是一个简单的学习率更新方式　。实践表明SGD通常能够找到一个最小值，但是它速度非常慢，它更依赖于更加鲁棒的初始化策略和更新策略。它非常容易陷入局部最小值也就是鞍点。因此，如果哦你需要快速的收敛性来训练神经网络，那么你最好选用一种自适应学习算率算法。</p>
+<h2 id="并行和分布式SGD"><a href="#并行和分布式SGD" class="headerlink" title="并行和分布式SGD"></a>并行和分布式SGD</h2><p>分布式SGD是加快大规模数据聚类方法最为直观的拌饭。<br>SGD本质上是顺序执行的，一步接着一步，逐渐的找到最小值。順序SGD具有良好的收斂特性，但是它在大規模數據集上執行太慢了。相反，异步执行SGD速度会加快，但是各节点上的通信会导致收敛性变差。另外，我们可以在一台机器上并行SGD不用大规模集群。下面的算法和结构是对分布式和并行SGD的优化方法。</p>
+<h3 id="Hogwild"><a href="#Hogwild" class="headerlink" title="Hogwild"></a>Hogwild</h3><p>Niu 等人在[23]介绍了一种更新策略被称作Hogwild.它允许在CPU上并行的更新SGD。处理器之间通过不枷锁的内存来实现共享。但是该方法只有在输入数据稀疏的情况下才有效，因为在此时每次更新的参数比例较小。实验表明在这种情况下，这种更新策略几乎可以取得等效的收敛性，因为处理器并不会对有用的信息进行重写覆盖。</p>
+<h3 id="Downpour-SGD"><a href="#Downpour-SGD" class="headerlink" title="Downpour SGD"></a>Downpour SGD</h3><p>Downpour SGD是SGD异步更新的一种方法，它最初由Dean等人在谷歌的分布式信念网中提出。它在很多服务器上进行训练。这些模型将他们的参数更新发送到一个服务器。每个机器负责更新一部分参数。然而，由于各子服务器并没有共享权重和更新，所以他们的参数会持续性的发散，影响收敛。</p>
+<h3 id="Delay-tolerant-Algorithms-for-SGD"><a href="#Delay-tolerant-Algorithms-for-SGD" class="headerlink" title="Delay-tolerant Algorithms for SGD"></a>Delay-tolerant Algorithms for SGD</h3><p>Mcmahan和Streeter[12]将AdaGrad通过采用延迟容忍算法扩展到了分布式的环境下。延迟容忍算法不仅根据过去的梯度更新，同时也根据延迟更新参数。该方法在实践中验证十分有效。</p>
+<h3 id="TensorFlow"><a href="#TensorFlow" class="headerlink" title="TensorFlow"></a>TensorFlow</h3><p>TensorFlow[13]是谷歌最佳开源的深度学习框架。它是基于他们过去在分布式信念网的工作开发的。在分布式执行时，一个图被划分为多个子图，在每个节点上通过Send/Receive节点对来实现通信。然而，目前的TensorFlow版本还不支持分布式公牛。在13.04.16分布式版本的TensorFlow已经发布。</p>
+<h3 id="Elastic-Averaging-SGD"><a href="#Elastic-Averaging-SGD" class="headerlink" title="Elastic Averaging SGD"></a>Elastic Averaging SGD</h3><p>Zhang等人[14]提出了弹性平均梯度下降算法(Elastic Averaging SGD),在该方法中，通过一种弹性力量来实现中心参数存储服务器和参数服务器之间变量的练习。该方式允许本地变量根据中心服务器存储的变量进行浮动。实验表明这可以极大的提高算法寻找到新的局部最优点的性能。</p>
+<h2 id="其他优化策略"><a href="#其他优化策略" class="headerlink" title="其他优化策略"></a>其他优化策略</h2><p>最后，我们介绍一些与前面提到的方法一起用来进一步提高SGD性能的优化策略。更为详细的策略综述可以参考综述问下[<a target="_blank" rel="noopener" href="http://sebastianruder.com/optimizing-gradient-descent/index.html#fn:22">22</a>].</p>
+<h3 id="洗牌和课程学习-Shuffling-and-Curriculum-Learning"><a href="#洗牌和课程学习-Shuffling-and-Curriculum-Learning" class="headerlink" title="洗牌和课程学习(Shuffling and Curriculum Learning)"></a>洗牌和课程学习(Shuffling and Curriculum Learning)</h3><p>通常，　我们需要避免训练样本的有序性从而避免它给我们的优化算法带来偏差，所以在每次迭代后对训练样本进行洗牌是个不错的选择。<br>另一方面，在我们旨在解决一些特定的难题时，以特定的顺序提供训练样本能够提高性能并且得到更好的收敛性。这种建立特定样本顺序的方法被称作课程学习[16].<br>Zareba和Sutskever[17]指出只能够通过训练LSTM算法来估算单个程序采用课程学习与混合策略方法会比采用原始的优化方法要号，其中顺序的样本带来了训练困难。</p>
+<h3 id="批量归一化-Batch-normalization"><a href="#批量归一化-Batch-normalization" class="headerlink" title="批量归一化(Batch normalization)"></a>批量归一化(Batch normalization)</h3><p>为了方便学习，我们通常需要在初始化阶段对参数通过初始化均值和方差都为０来对参数进行归一化。随着训练过程的进行，我们在不同的范围内根系参数，参数的正则特性丢失，随着神经网络层次的加深，这将会导致寻两变慢，并且扩大了波动。</p>
+<p>批量归一化(Batch normalization)[18]在每次Mini-batch更新时重新建立正则化和变化，正则和和改变都通过反馈操作同时向前传递。通过将模型部分的正则和，我们可以使用更高的学习率，并且减少对正则参数的关注度。批量归一化另外夜扮演着规则化和减少(有时避免)需要Dropout.</p>
+<h3 id="尽早停止-Early-stopping"><a href="#尽早停止-Early-stopping" class="headerlink" title="尽早停止(Early stopping)"></a>尽早停止(Early stopping)</h3><p>根据 Geoff Hinton　“Early stopping (is) beautiful free lunch” (<a target="_blank" rel="noopener" href="http://www.iro.umontreal.ca/~bengioy/talks/DL-Tutorial-NIPS2015.pdf">NIPS 2015 Tutorial slides</a>, slide 63)”所述。你应当在训练过程中经常监视在验证集上的错误率　，如果验证错误没有提高的化，尽早停止训练过程。</p>
+<h3 id="梯度噪声-Gradient-noise"><a href="#梯度噪声-Gradient-noise" class="headerlink" title="梯度噪声(Gradient noise)"></a>梯度噪声(Gradient noise)</h3><p>Neelakantan[21]在每次更新梯度时通过下式增加了高斯噪声$N(0,\sigma_{t}^{2})$：</p>
+<p>$$g_{t,i} = g_{t,i} + N(0,\sigma_{t}^{2})$$</p>
+<p>他们通过以下算法来减少波动:</p>
+<p>$$\sigma_{t}^{2} = \frac{\eta}{(1+t)^{\gamma}}$$</p>
+<p>他们证明了通过增加噪声能够使得神经网络更加陆帮，并且能够帮助训练更复杂和更深的神经网络结构。他们怀疑噪声能够使得模型能够有更大的机会逃离局部最小值，在网络层次加深时，局部最小值更多。</p>
+<h2 id="结论"><a href="#结论" class="headerlink" title="结论"></a>结论</h2><p>在本文中，我们首先介绍了三种梯度下降算法，其中Mini-batch梯度下降算法是使用最广泛的梯度下降算法。我们演技了当前最常见的梯度下降优化算法如: 动量(Momentum), Nesterov加速梯度算法，Adagrad, Adadelta, RMSprop以及异步梯度下降算法优化方法。最后，我们也考察了其他的梯度下降优化策略，如: 洗牌与课程学习，批量归一化和尽早停止等方法。</p>
+<p>我希望本文能够让你对不同梯度下降优化算法的动机和行为有直观的认识。还有哪些常用的梯度下降算法我遗漏了？或者是你在实际中常用的梯度下降优化算法有哪些？都可以在留言中告诉我。</p>
+<h2 id="致谢"><a href="#致谢" class="headerlink" title="致谢"></a>致谢</h2><p>感谢　<a target="_blank" rel="noopener" href="https://twitter.com/dennybritz">Denny Britz</a>　和　<a target="_blank" rel="noopener" href="https://twitter.com/cesarsvs">Cesar Salgado</a>　阅读本文的草稿并提出了建议。</p>
+<h2 id="打印版本引用"><a href="#打印版本引用" class="headerlink" title="打印版本引用"></a>打印版本引用</h2><p>本文也可以在　<a target="_blank" rel="noopener" href="https://arxiv.org/abs/1609.04747">arXiv</a>上找到，如果你觉得本文对你有帮助，可以考虑引用本文:</p>
+<blockquote>
+<p>Sebastian Ruder (2016). An overview of gradient descent optimisation algorithms. arXiv preprint arXiv:1609.04747.</p>
+</blockquote>
+<h2 id="翻译"><a href="#翻译" class="headerlink" title="翻译"></a>翻译</h2><p>本博文被翻译成了以下语言:</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="http://postd.cc/optimizing-gradient-descent/">日语</a></li>
+<li><a target="_blank" rel="noopener" href="http://blog.csdn.net/google19890102/article/details/69942970">中文</a><br>2016年６月２１更新，本博客也发布在了Hacker News上，这些 <a target="_blank" rel="noopener" href="https://news.ycombinator.com/item?id=11943685">讨论</a>提出了一些有趣的点和相关工作。</li>
+</ul>
+<h2 id="参考文献"><a href="#参考文献" class="headerlink" title="参考文献"></a>参考文献</h2><p>[1]:Sutton, R. S. (1986). Two problems with backpropagation and other steepest-descent learning procedures for networks. Proc. 8th Annual Conf. Cognitive Science Society.<br>[2]: Qian, N. (1999). On the momentum term in gradient descent learning algorithms. Neural Networks : The Official Journal of the International Neural Network Society, 12(1), 145–151. <a target="_blank" rel="noopener" href="http://doi.org/10.1016/S0893-6080(98)00116-6">http://doi.org/10.1016/S0893-6080(98)00116-6</a><br>[3]: Duchi, J., Hazan, E., &amp; Singer, Y. (2011). Adaptive Subgradient Methods for Online Learning and Stochastic Optimization. Journal of Machine Learning Research, 12, 2121–2159. Retrieved from <a target="_blank" rel="noopener" href="http://jmlr.org/papers/v12/duchi11a.html">http://jmlr.org/papers/v12/duchi11a.html</a><br>[4]: Dean, J., Corrado, G. S., Monga, R., Chen, K., Devin, M., Le, Q. V, … Ng, A. Y. (2012). Large Scale Distributed Deep Networks. NIPS 2012: Neural Information Processing Systems, 1–11. <a target="_blank" rel="noopener" href="http://doi.org/10.1109/ICDAR.2011.95">http://doi.org/10.1109/ICDAR.2011.95</a><br>[5]: Pennington, J., Socher, R., &amp; Manning, C. D. (2014). Glove: Global Vectors for Word Representation. Proceedings of the 2014 Conference on Empirical Methods in Natural Language Processing, 1532–1543. <a target="_blank" rel="noopener" href="http://doi.org/10.3115/v1/D14-1162">http://doi.org/10.3115/v1/D14-1162</a><br>[6]: Zeiler, M. D. (2012). ADADELTA: An Adaptive Learning Rate Method. Retrieved from <a target="_blank" rel="noopener" href="http://arxiv.org/abs/1212.5701">http://arxiv.org/abs/1212.5701</a><br>[7]: Nesterov, Y. (1983). A method for unconstrained convex minimization problem with the rate of convergence o(1/k2). Doklady ANSSSR (translated as Soviet.Math.Docl.), vol. 269, pp. 543– 547.<br>[8]: Bengio, Y., Boulanger-Lewandowski, N., &amp; Pascanu, R. (2012). Advances in Optimizing Recurrent Networks. Retrieved from <a target="_blank" rel="noopener" href="http://arxiv.org/abs/1212.0901">http://arxiv.org/abs/1212.0901</a><br>[9]: Sutskever, I. (2013). Training Recurrent neural Networks. PhD Thesis.<br>[10]: Darken, C., Chang, J., &amp; Moody, J. (1992). Learning rate schedules for faster stochastic gradient search. Neural Networks for Signal Processing II Proceedings of the 1992 IEEE Workshop, (September), 1–11. <a target="_blank" rel="noopener" href="http://doi.org/10.1109/NNSP.1992.253713">http://doi.org/10.1109/NNSP.1992.253713</a><br>[11]: H. Robinds and S. Monro, “A stochastic approximation method,” Annals of Mathematical Statistics, vol. 22, pp. 400–407, 1951.<br>[12]: Mcmahan, H. B., &amp; Streeter, M. (2014). Delay-Tolerant Algorithms for Asynchronous Distributed Online Learning. Advances in Neural Information Processing Systems (Proceedings of NIPS), 1–9. Retrieved from <a target="_blank" rel="noopener" href="http://papers.nips.cc/paper/5242-delay-tolerant-algorithms-for-asynchronous-distributed-online-learning.pdf">http://papers.nips.cc/paper/5242-delay-tolerant-algorithms-for-asynchronous-distributed-online-learning.pdf</a><br>[13]: Abadi, M., Agarwal, A., Barham, P., Brevdo, E., Chen, Z., Citro, C., … Zheng, X. (2015). TensorFlow : Large-Scale Machine Learning on Heterogeneous Distributed Systems.<br>[14]: Zhang, S., Choromanska, A., &amp; LeCun, Y. (2015). Deep learning with Elastic Averaging SGD. Neural Information Processing Systems Conference (NIPS 2015), 1–24. Retrieved from <a target="_blank" rel="noopener" href="http://arxiv.org/abs/1412.6651">http://arxiv.org/abs/1412.6651</a><br>[15]: Kingma, D. P., &amp; Ba, J. L. (2015). Adam: a Method for Stochastic Optimization. International Conference on Learning Representations, 1–13.<br>[16]: Bengio, Y., Louradour, J., Collobert, R., &amp; Weston, J. (2009). Curriculum learning. Proceedings of the 26th Annual International Conference on Machine Learning, 41–48. <a target="_blank" rel="noopener" href="http://doi.org/10.1145/1553374.1553380">http://doi.org/10.1145/1553374.1553380</a><br>[17]: Zaremba, W., &amp; Sutskever, I. (2014). Learning to Execute, 1–25. Retrieved from <a target="_blank" rel="noopener" href="http://arxiv.org/abs/1410.4615">http://arxiv.org/abs/1410.4615</a><br>[18]: Ioffe, S., &amp; Szegedy, C. (2015). Batch Normalization : Accelerating Deep Network Training by Reducing Internal Covariate Shift. arXiv Preprint arXiv:1502.03167v3.<br>[19]: Dauphin, Y., Pascanu, R., Gulcehre, C., Cho, K., Ganguli, S., &amp; Bengio, Y. (2014). Identifying and attacking the saddle point problem in high-dimensional non-convex optimization. arXiv, 1–14. Retrieved from <a target="_blank" rel="noopener" href="http://arxiv.org/abs/1406.2572">http://arxiv.org/abs/1406.2572</a><br>[20]: Sutskever, I., &amp; Martens, J. (2013). On the importance of initialization and momentum in deep learning. <a target="_blank" rel="noopener" href="http://doi.org/10.1109/ICASSP.2013.6639346">http://doi.org/10.1109/ICASSP.2013.6639346</a><br>[21]: Neelakantan, A., Vilnis, L., Le, Q. V., Sutskever, I., Kaiser, L., Kurach, K., &amp; Martens, J. (2015). Adding Gradient Noise Improves Learning for Very Deep Networks, 1–11. Retrieved from <a target="_blank" rel="noopener" href="http://arxiv.org/abs/1511.06807">http://arxiv.org/abs/1511.06807</a><br>[22]: LeCun, Y., Bottou, L., Orr, G. B., &amp; Müller, K. R. (1998). Efficient BackProp. Neural Networks: Tricks of the Trade, 1524, 9–50. <a target="_blank" rel="noopener" href="http://doi.org/10.1007/3-540-49430-8_2">http://doi.org/10.1007/3-540-49430-8_2</a><br>[23]: Niu, F., Recht, B., Christopher, R., &amp; Wright, S. J. (2011). Hogwild! : A Lock-Free Approach to Parallelizing Stochastic Gradient Descent, 1–22.<br>[24]: Duchi et al. [3] give this matrix as an alternative to the full matrix containing the outer products of all previous gradients, as the computation of the matrix square root is infeasible even for a moderate number of parameters d.</p>
+
+    </div>
+
+    
+    
+    
+      
+  <div class="popular-posts-header">相关文章</div>
+  <ul class="popular-posts">
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\archives\1794da09.html" rel="bookmark">七大数据降维算法</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\archives\76ca9339.html" rel="bookmark">如何撰写文献评述</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\archives\8176357a.html" rel="bookmark">通往数据科学家之路</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\archives\588652e8.html" rel="bookmark">如何在 LaTeX 文档中包含 Matlab 代码</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\archives\cd94c987.html" rel="bookmark">如何选择分类器</a></div>
+    </li>
+  </ul>
+
+
+    <footer class="post-footer">
+          <div class="reward-container">
+  <div>Buy me a coffee</div>
+  <button onclick="document.querySelector('.post-reward').classList.toggle('active');">
+    赞赏
+  </button>
+  <div class="post-reward">
+      <div>
+        <img src="/images/wechatpay.png" alt="三流先生 微信">
+        <span>微信</span>
+      </div>
+      <div>
+        <img src="/images/alipay.png" alt="三流先生 支付宝">
+        <span>支付宝</span>
+      </div>
+
+  </div>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/%E7%BF%BB%E8%AF%91/" rel="tag"># 翻译</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/archives/c1562f18.html" rel="prev" title="记忆中的美好——《假如给我三天光明》">
+                  <i class="fa fa-chevron-left"></i> 记忆中的美好——《假如给我三天光明》
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/archives/1994da85.html" rel="next" title="岁月神偷">
+                  岁月神偷 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      const activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      const commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 2011 – 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">三流先生</span>
+</div>
+<div class="wordcount">
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-line"></i>
+    </span>
+      <span>站点总字数：</span>
+    <span title="站点总字数">214k</span>
+  </span>
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span>站点阅读时长 &asymp;</span>
+    <span title="站点阅读时长">3:15</span>
+  </span>
+</div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="//cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+
+
+  <script async src="/js/fireworks.js"></script>
+
+
+
+
+  <script src="/js/activate-power-mode.min.js"></script>
+  <script>
+    POWERMODE.colorful = true;
+    POWERMODE.shake = false;
+    document.body.addEventListener('input', POWERMODE);
+  </script>
+
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"log":false,"model":{"jsonPath":"/live2dw/assets/miku.model.json"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":true},"react":{"opacity":0.7}});</script></body>
+</html>

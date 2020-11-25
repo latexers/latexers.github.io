@@ -1,0 +1,947 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="https://fonts.loli.net/css?family=Lato:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.1/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css">
+
+<script class="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"wangmurong.org.cn","root":"/","images":"/images","scheme":"Pisces","version":"8.0.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}};
+  </script>
+<meta name="description" content="背景知识分形(Fractal)是芒德勃罗在 1973 年提出的一个数学概念。通常分形被定义为一个粗糙或零碎的集合形状，可以分成数个部分，且每一部分都是整体缩小后的形状，定义表明分形具有自相似性。在 LaTeX 中，可以通过 Lindenmayer System Drawing Library 来实现分形图形的绘制，Lindenmayer System 又称L系统，L-system是一系列不同形式的">
+<meta property="og:type" content="article">
+<meta property="og:title" content="LaTeX中绘制分形图形">
+<meta property="og:url" content="http://wangmurong.org.cn/archives/17d5c709.html">
+<meta property="og:site_name" content="风陵渡">
+<meta property="og:description" content="背景知识分形(Fractal)是芒德勃罗在 1973 年提出的一个数学概念。通常分形被定义为一个粗糙或零碎的集合形状，可以分成数个部分，且每一部分都是整体缩小后的形状，定义表明分形具有自相似性。在 LaTeX 中，可以通过 Lindenmayer System Drawing Library 来实现分形图形的绘制，Lindenmayer System 又称L系统，L-system是一系列不同形式的">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://wangmurong.org.cn/img/plants.png">
+<meta property="article:published_time" content="2015-05-03T00:00:00.000Z">
+<meta property="article:modified_time" content="2020-11-18T06:51:53.290Z">
+<meta property="article:author" content="三流先生">
+<meta property="article:tag" content="LaTeX">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://wangmurong.org.cn/img/plants.png">
+
+
+<link rel="canonical" href="http://wangmurong.org.cn/archives/17d5c709.html">
+
+
+<script class="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+<title>LaTeX中绘制分形图形 | 风陵渡</title>
+  
+
+
+
+  <noscript>
+  <style>
+  body { margin-top: 2rem; }
+
+  .use-motion .menu-item,
+  .use-motion .sidebar,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header {
+    visibility: visible;
+  }
+
+  .use-motion .header,
+  .use-motion .site-brand-container .toggle,
+  .use-motion .footer { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle,
+  .use-motion .custom-logo-image {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line {
+    transform: scaleX(1);
+  }
+
+  .search-pop-overlay, .sidebar-nav { display: none; }
+  .sidebar-panel { display: block; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="风陵渡" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">风陵渡</h1>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">且趁闲身未老，须放我些子疏狂</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-gallery">
+
+    <a href="/gallery/" rel="section"><i class="fa fa-camera fa-fw"></i>图集</a>
+
+  </li>
+        <li class="menu-item menu-item-movies">
+
+    <a href="/movies/" rel="section"><i class="fa fa-film fa-fw"></i>观影</a>
+
+  </li>
+        <li class="menu-item menu-item-books">
+
+    <a href="/books/" rel="section"><i class="fa fa-book fa-fw"></i>阅读</a>
+
+  </li>
+        <li class="menu-item menu-item-whisper">
+
+    <a href="/whisper/" rel="section"><i class="fa fa-sticky-note fa-fw"></i>碎笔</a>
+
+  </li>
+        <li class="menu-item menu-item-excert">
+
+    <a href="/excert/" rel="section"><i class="fa fa-feather-alt fa-fw"></i>摘抄</a>
+
+  </li>
+        <li class="menu-item menu-item-favorite">
+
+    <a href="/favorite/" rel="section"><i class="fa fa-star fa-fw"></i>收藏</a>
+
+  </li>
+        <li class="menu-item menu-item-tools">
+
+    <a href="/tools/" rel="section"><i class="fa fa-tools fa-fw"></i>工具</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <section class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%83%8C%E6%99%AF%E7%9F%A5%E8%AF%86"><span class="nav-number">1.</span> <span class="nav-text">背景知识</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Lindenmayer-System-Drawing-Library-%E7%AE%80%E4%BB%8B"><span class="nav-number">2.</span> <span class="nav-text">Lindenmayer System Drawing Library 简介</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AC%A6%E5%8F%B7%E4%B8%8E%E8%A7%84%E5%88%99"><span class="nav-number">2.1.</span> <span class="nav-text">符号与规则</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BA%B7%E6%89%98%E5%B0%94%E5%B0%98-Cantor-Dust"><span class="nav-number">3.</span> <span class="nav-text">康托尔尘(Cantor Dust)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%A7%91%E5%85%8B%E6%9B%B2%E7%BA%BF-Koch-Curve"><span class="nav-number">4.</span> <span class="nav-text">科克曲线(Koch Curve)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B8%8C%E5%B0%94%E4%BC%AF%E7%89%B9%E6%9B%B2%E7%BA%BF-Hilbert-curve"><span class="nav-number">5.</span> <span class="nav-text">希尔伯特曲线(Hilbert curve)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%BE%99%E5%BD%A2%E6%9B%B2%E7%BA%BF-Dragon-Curve"><span class="nav-number">6.</span> <span class="nav-text">龙形曲线(Dragon Curve)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%B0%A2%E5%B0%94%E5%AE%BE%E6%96%AF%E5%9F%BA%E4%B8%89%E8%A7%92%E5%BD%A2-Sierpinski-triangle"><span class="nav-number">7.</span> <span class="nav-text">谢尔宾斯基三角形(Sierpinski triangle)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%86%E5%BD%A2%E6%A4%8D%E7%89%A9-Fractal-Plants"><span class="nav-number">8.</span> <span class="nav-text">分形植物(Fractal Plants)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">9.</span> <span class="nav-text">总结</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E9%93%BE%E6%8E%A5"><span class="nav-number">10.</span> <span class="nav-text">参考链接</span></a></li></ol></div>
+        </section>
+        <!--/noindex-->
+
+        <section class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="三流先生"
+      src="/images/codercat.jpg">
+  <p class="site-author-name" itemprop="name">三流先生</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">125</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">24</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/latexers" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;latexers" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i></a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:murongwang@outlook.com.com" title="E-Mail → mailto:murongwang@outlook.com.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i></a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/atom.xml" title="Rss → &#x2F;atom.xml"><i class="fa fa-rss fa-fw"></i></a>
+      </span>
+  </div>
+
+
+
+    <div class="links-of-blogroll motion-element links-of-blogroll-block">
+      <div class="links-of-blogroll-title">
+        <!-- modify icon to fire by szw -->
+        <i class="fa fa-history fa-" aria-hidden="true"></i>
+        近期文章
+      </div>
+      <ul class="links-of-blogroll-list">
+        
+        
+          <li>
+            <a href="/archives/4998123a.html" title="且慢，前面听说风很大" target="_blank">且慢，前面听说风很大</a>
+          </li>
+        
+          <li>
+            <a href="/archives/e25d1b6d.html" title="泯灭之路——大屠杀之根源、历史与余波" target="_blank">泯灭之路——大屠杀之根源、历史与余波</a>
+          </li>
+        
+          <li>
+            <a href="/archives/f47cb09a.html" title="羊城两周记" target="_blank">羊城两周记</a>
+          </li>
+        
+          <li>
+            <a href="/archives/10c90e85.html" title="增强现实显微镜——实时自动癌症检测" target="_blank">增强现实显微镜——实时自动癌症检测</a>
+          </li>
+        
+          <li>
+            <a href="/archives/1994da85.html" title="岁月神偷" target="_blank">岁月神偷</a>
+          </li>
+        
+      </ul>
+    </div>
+
+
+<div style="">
+  <canvas id="canvas" style="width:60%;">当前浏览器不支持canvas，请更换浏览器后再试</canvas>
+</div>
+<script>
+(function(){
+
+   var digit=
+    [
+        [
+            [0,0,1,1,1,0,0],
+            [0,1,1,0,1,1,0],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [0,1,1,0,1,1,0],
+            [0,0,1,1,1,0,0]
+        ],//0
+        [
+            [0,0,0,1,1,0,0],
+            [0,1,1,1,1,0,0],
+            [0,0,0,1,1,0,0],
+            [0,0,0,1,1,0,0],
+            [0,0,0,1,1,0,0],
+            [0,0,0,1,1,0,0],
+            [0,0,0,1,1,0,0],
+            [0,0,0,1,1,0,0],
+            [0,0,0,1,1,0,0],
+            [1,1,1,1,1,1,1]
+        ],//1
+        [
+            [0,1,1,1,1,1,0],
+            [1,1,0,0,0,1,1],
+            [0,0,0,0,0,1,1],
+            [0,0,0,0,1,1,0],
+            [0,0,0,1,1,0,0],
+            [0,0,1,1,0,0,0],
+            [0,1,1,0,0,0,0],
+            [1,1,0,0,0,0,0],
+            [1,1,0,0,0,1,1],
+            [1,1,1,1,1,1,1]
+        ],//2
+        [
+            [1,1,1,1,1,1,1],
+            [0,0,0,0,0,1,1],
+            [0,0,0,0,1,1,0],
+            [0,0,0,1,1,0,0],
+            [0,0,1,1,1,0,0],
+            [0,0,0,0,1,1,0],
+            [0,0,0,0,0,1,1],
+            [0,0,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [0,1,1,1,1,1,0]
+        ],//3
+        [
+            [0,0,0,0,1,1,0],
+            [0,0,0,1,1,1,0],
+            [0,0,1,1,1,1,0],
+            [0,1,1,0,1,1,0],
+            [1,1,0,0,1,1,0],
+            [1,1,1,1,1,1,1],
+            [0,0,0,0,1,1,0],
+            [0,0,0,0,1,1,0],
+            [0,0,0,0,1,1,0],
+            [0,0,0,1,1,1,1]
+        ],//4
+        [
+            [1,1,1,1,1,1,1],
+            [1,1,0,0,0,0,0],
+            [1,1,0,0,0,0,0],
+            [1,1,1,1,1,1,0],
+            [0,0,0,0,0,1,1],
+            [0,0,0,0,0,1,1],
+            [0,0,0,0,0,1,1],
+            [0,0,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [0,1,1,1,1,1,0]
+        ],//5
+        [
+            [0,0,0,0,1,1,0],
+            [0,0,1,1,0,0,0],
+            [0,1,1,0,0,0,0],
+            [1,1,0,0,0,0,0],
+            [1,1,0,1,1,1,0],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [0,1,1,1,1,1,0]
+        ],//6
+        [
+            [1,1,1,1,1,1,1],
+            [1,1,0,0,0,1,1],
+            [0,0,0,0,1,1,0],
+            [0,0,0,0,1,1,0],
+            [0,0,0,1,1,0,0],
+            [0,0,0,1,1,0,0],
+            [0,0,1,1,0,0,0],
+            [0,0,1,1,0,0,0],
+            [0,0,1,1,0,0,0],
+            [0,0,1,1,0,0,0]
+        ],//7
+        [
+            [0,1,1,1,1,1,0],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [0,1,1,1,1,1,0],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [0,1,1,1,1,1,0]
+        ],//8
+        [
+            [0,1,1,1,1,1,0],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [0,1,1,1,0,1,1],
+            [0,0,0,0,0,1,1],
+            [0,0,0,0,0,1,1],
+            [0,0,0,0,1,1,0],
+            [0,0,0,1,1,0,0],
+            [0,1,1,0,0,0,0]
+        ],//9
+        [
+            [0,0,0,0,0,0,0],
+            [0,0,1,1,1,0,0],
+            [0,0,1,1,1,0,0],
+            [0,0,1,1,1,0,0],
+            [0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0],
+            [0,0,1,1,1,0,0],
+            [0,0,1,1,1,0,0],
+            [0,0,1,1,1,0,0],
+            [0,0,0,0,0,0,0]
+        ]//:
+    ];
+
+var canvas = document.getElementById('canvas');
+
+if(canvas.getContext){
+    var cxt = canvas.getContext('2d');
+    //声明canvas的宽高
+    var H = 100,W = 700;
+    canvas.height = H;
+    canvas.width = W;
+    cxt.fillStyle = '#f00';
+    cxt.fillRect(10,10,50,50);
+
+    //存储时间数据
+    var data = [];
+    //存储运动的小球
+    var balls = [];
+    //设置粒子半径
+    var R = canvas.height/20-1;
+    (function(){
+        var temp = /(\d)(\d):(\d)(\d):(\d)(\d)/.exec(new Date());
+        //存储时间数字，由十位小时、个位小时、冒号、十位分钟、个位分钟、冒号、十位秒钟、个位秒钟这7个数字组成
+        data.push(temp[1],temp[2],10,temp[3],temp[4],10,temp[5],temp[6]);
+    })();
+
+    /*生成点阵数字*/
+    function renderDigit(index,num){
+        for(var i = 0; i < digit[num].length; i++){
+            for(var j = 0; j < digit[num][i].length; j++){
+                if(digit[num][i][j] == 1){
+                    cxt.beginPath();
+                    cxt.arc(14*(R+2)*index + j*2*(R+1)+(R+1),i*2*(R+1)+(R+1),R,0,2*Math.PI);
+                    cxt.closePath();
+                    cxt.fill();
+                }
+            }
+        }
+    }
+
+    /*更新时钟*/
+    function updateDigitTime(){
+        var changeNumArray = [];
+        var temp = /(\d)(\d):(\d)(\d):(\d)(\d)/.exec(new Date());
+        var NewData = [];
+        NewData.push(temp[1],temp[2],10,temp[3],temp[4],10,temp[5],temp[6]);
+        for(var i = data.length-1; i >=0 ; i--){
+            //时间发生变化
+            if(NewData[i] !== data[i]){
+                //将变化的数字值和在data数组中的索引存储在changeNumArray数组中
+                changeNumArray.push(i+'_'+(Number(data[i])+1)%10);
+            }
+        }
+        //增加小球
+        for(var i = 0; i< changeNumArray.length; i++){
+            addBalls.apply(this,changeNumArray[i].split('_'));
+        }
+        data = NewData.concat();
+    }
+
+    /*更新小球状态*/
+    function updateBalls(){
+        for(var i = 0; i < balls.length; i++){
+            balls[i].stepY += balls[i].disY;
+            balls[i].x += balls[i].stepX;
+            balls[i].y += balls[i].stepY;
+            if(balls[i].x > W + R || balls[i].y > H + R){
+                balls.splice(i,1);
+                i--;
+            }
+        }
+    }
+
+    /*增加要运动的小球*/
+    function addBalls(index,num){
+        var numArray = [1,2,3];
+        var colorArray =  ["#3BE","#09C","#A6C","#93C","#9C0","#690","#FB3","#F80","#F44","#C00"];
+        for(var i = 0; i < digit[num].length; i++){
+            for(var j = 0; j < digit[num][i].length; j++){
+                if(digit[num][i][j] == 1){
+                    var ball = {
+                        x:14*(R+2)*index + j*2*(R+1)+(R+1),
+                        y:i*2*(R+1)+(R+1),
+                        stepX:Math.floor(Math.random() * 4 -2),
+                        stepY:-2*numArray[Math.floor(Math.random()*numArray.length)],
+                        color:colorArray[Math.floor(Math.random()*colorArray.length)],
+                        disY:1
+                    };
+                    balls.push(ball);
+                }
+            }
+        }
+    }
+
+    /*渲染*/
+    function render(){
+        //重置画布宽度，达到清空画布的效果
+        canvas.height = 100;
+        //渲染时钟
+        for(var i = 0; i < data.length; i++){
+            renderDigit(i,data[i]);
+        }
+        //渲染小球
+        for(var i = 0; i < balls.length; i++){
+            cxt.beginPath();
+            cxt.arc(balls[i].x,balls[i].y,R,0,2*Math.PI);
+            cxt.fillStyle = balls[i].color;
+            cxt.closePath();
+            cxt.fill();
+        }
+    }
+
+    clearInterval(oTimer);
+    var oTimer = setInterval(function(){
+        //更新时钟
+        updateDigitTime();
+        //更新小球状态
+        updateBalls();
+        //渲染
+        render();
+    },50);
+}
+
+})();
+</script>
+        </section>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://wangmurong.org.cn/archives/17d5c709.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/codercat.jpg">
+      <meta itemprop="name" content="三流先生">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="风陵渡">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          LaTeX中绘制分形图形
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2015-05-03 00:00:00" itemprop="dateCreated datePublished" datetime="2015-05-03T00:00:00Z">2015-05-03</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2020-11-18 06:51:53" itemprop="dateModified" datetime="2020-11-18T06:51:53Z">2020-11-18</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E6%8E%92%E7%89%88/" itemprop="url" rel="index"><span itemprop="name">排版</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+<div class="translate-style">
+繁/简：<a id="translateLink" href="javascript:translatePage();">繁体
+</a>
+</div>
+<script type="text/javascript" src="/js/tw_cn.js"></script>
+<script type="text/javascript">
+var defaultEncoding = 2; //网站编写字体是否繁体，1-繁体，2-简体
+var translateDelay = 0; //延迟时间,若不在前, 要设定延迟翻译时间, 如100表示100ms,默认为0
+var cookieDomain = "https://tding.top/"; //Cookie地址, 一定要设定, 通常为你的网址
+var msgToTraditionalChinese = "繁体"; //此处可以更改为你想要显示的文字
+var msgToSimplifiedChinese = "简体"; //同上，但两处均不建议更改
+var translateButtonId = "translateLink"; //默认互换id
+translateInitilization();
+</script>
+
+
+      </div>
+      <div class="post-meta">
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>4.4k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>4 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h2 id="背景知识"><a href="#背景知识" class="headerlink" title="背景知识"></a>背景知识</h2><p>分形(Fractal)是芒德勃罗在 1973 年提出的一个数学概念。通常分形被定义为<em>一个粗糙或零碎的集合形状，可以分成数个部分，且每一部分都是整体缩小后的形状</em>，定义表明分形具有自相似性。在 LaTeX 中，可以通过 Lindenmayer System Drawing Library 来实现分形图形的绘制，Lindenmayer System 又称L系统，L-system是一系列不同形式的正规语法规则，多被用于植物生长过程建模，但是也被用于模拟各种生物体的形态。<a id="more"></a>L-system也能用于生成自相似的分形，例如迭代函数系统，与分形图形绘制。L系统由一系列的符号、绘制动作组成如(向左转，向前移动)以及一系列的规则(如重复)组成。在 LaTeX 中的 Lindenmayer System Drawing Library 包的用法符合L系统的基本特性。因此使用 Lindenmayer 宏包绘制分形图形的关键就是了解图形的L系统的表示。</p>
+<h2 id="Lindenmayer-System-Drawing-Library-简介"><a href="#Lindenmayer-System-Drawing-Library-简介" class="headerlink" title="Lindenmayer System Drawing Library 简介"></a>Lindenmayer System Drawing Library 简介</h2><p>在上文中提到了L系统主要由符号与绘制动作以及规则组成，LaTeX 中的 L 系统也同样由这些规则组成，在 LaTeX 绘制分形主要可以分为两步</p>
+<ul>
+<li>定义分形的相应符号与规则。</li>
+<li>绘制分形图形。</li>
+</ul>
+<h3 id="符号与规则"><a href="#符号与规则" class="headerlink" title="符号与规则"></a>符号与规则</h3><p>在 Lindenmayer System Drawing Library 中提供了六种基本符号，辅助完成图形绘制，简要说明如下：</p>
+<ul>
+<li>F 向前移动一段距离并绘制相应线条</li>
+<li>f 向前移动一段距离不绘制线条</li>
+<li>+ 向左旋转相应角度</li>
+<li>- 向右移动相应角度</li>
+<li>[ 存储当前状态</li>
+<li>] 恢复存储状态</li>
+</ul>
+<p>通过以上中符号进行组合，可以绘制出常见的一些分形图形，另外在该宏包中还定义了一些其他的绘制命令，通过这些命令可以自定义符号与规则，完成一些其他复杂图形绘制，但比较遗憾的是该宏包无法进行三维分形图形的绘制。关于这些命令的具体使用方法可以参考 tikz 的用户手册，下面是一些常见分形图形的绘制代码！</p>
+<h2 id="康托尔尘-Cantor-Dust"><a href="#康托尔尘-Cantor-Dust" class="headerlink" title="康托尔尘(Cantor Dust)"></a>康托尔尘(Cantor Dust)</h2><p>康托尔集是散落在线段上的一些点，这些点通过不断的将线段三等分，截断中间的部分形成。绘制代码如下：</p>
+<figure class="highlight tex"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">\pgfdeclarelindenmayersystem&#123;Cantor Dust&#125;&#123;</span><br><span class="line">	\symbol&#123;X&#125;&#123;\pgflsystemmoveforward&#125; % 定义符号</span><br><span class="line">	\symbol&#123;Y&#125;&#123;\pgflsystemdrawforward&#125;</span><br><span class="line">	\rule&#123;X -&gt; XYX&#125;  % 定义规则</span><br><span class="line">	\rule&#123;Y -&gt; YXY&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">\begin&#123;tikzpicture&#125;</span><br><span class="line">\draw[green!50!black][lindenmayer system&#x3D;&#123;Cantor Dust, axiom&#x3D;X, order&#x3D;2&#125;] %绘制图形，其中axiom表示起始点，order表示阶数，可以调节</span><br><span class="line">lindenmayer system;</span><br><span class="line">\end&#123;tikzpicture&#125;</span><br></pre></td></tr></table></figure>
+
+<p>绘制结果如图所示：<br>![Cantor Dust](/img/Cantor Dust.png)</p>
+<h2 id="科克曲线-Koch-Curve"><a href="#科克曲线-Koch-Curve" class="headerlink" title="科克曲线(Koch Curve)"></a>科克曲线(Koch Curve)</h2><p>设想一个边长为1的等边三角形，取每边中间的三分之一，接上去一个形状完全相似的但边长为其三分之一的三角形，结果是一个六角形。现在取六角形的每个边做同样的变换，即在中间三分之一接上更小的三角形，以此重复，直至无穷。外界的变得原来越细微曲折，形状接近理想化的雪花。他的名字叫科克曲线，因为瑞典数学家科克在1904年第一次描述了这种不论由直段还是由曲段组成的始终保持连通的线。</p>
+<figure class="highlight tex"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">\pgfdeclarelindenmayersystem&#123;Koch curve&#125;&#123;</span><br><span class="line">\rule&#123;F -&gt; F-F++F-F&#125;&#125;</span><br><span class="line">\begin&#123;tikzpicture&#125;</span><br><span class="line">\shadedraw[shading&#x3D;color wheel] </span><br><span class="line">[l-system&#x3D;&#123;Koch curve, step&#x3D;2pt, angle&#x3D;60, axiom&#x3D;F++F++F, order&#x3D;4&#125;]</span><br><span class="line">lindenmayer system -- cycle;</span><br><span class="line">\end&#123;tikzpicture&#125;</span><br></pre></td></tr></table></figure>
+
+<p>绘制结果如图所示：<br>![Koch curve](/img/Koch Curve.png)</p>
+<h2 id="希尔伯特曲线-Hilbert-curve"><a href="#希尔伯特曲线-Hilbert-curve" class="headerlink" title="希尔伯特曲线(Hilbert curve)"></a>希尔伯特曲线(Hilbert curve)</h2><p>希尔伯特曲线是一种能填充满一个平面正方形的分形曲线（空间填充曲线）由皮亚诺在1890年发现，由大卫·希尔伯特在1891年绘制出，</p>
+<figure class="highlight tex"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">\pgfdeclarelindenmayersystem&#123;Hilbert curve&#125;&#123;</span><br><span class="line">  \rule&#123;L -&gt; +RF-LFL-FR+&#125;</span><br><span class="line">  \rule&#123;R -&gt; -LF+RFR+FL-&#125;&#125;</span><br><span class="line">\begin&#123;tikzpicture&#125;</span><br><span class="line">    \draw [green!50!black, rotate&#x3D;90]</span><br><span class="line">    [l-system&#x3D;&#123;Fractal plant, axiom&#x3D;X, order&#x3D;6, step&#x3D;2pt, angle&#x3D;25&#125;]</span><br><span class="line">    lindenmayer system; </span><br><span class="line">\end&#123;tikzpicture&#125;</span><br></pre></td></tr></table></figure>
+
+<p>示例绘图结果：<br>![Koch curve](/img/Hilbert Curve.png)</p>
+<h2 id="龙形曲线-Dragon-Curve"><a href="#龙形曲线-Dragon-Curve" class="headerlink" title="龙形曲线(Dragon Curve)"></a>龙形曲线(Dragon Curve)</h2><p>Heighway dragon curve<br>龙形曲线是由美国科学家 John Heighway, Bruce Banks, and William Harter 提出，因此又称为 Harter–Heighway dragon。龙形曲线着色后形状与中国龙图腾中的蟠龙类似，但在本文的例子中并没有对其着色，绘制的阶数也偏低，因此，并不美丽！后续改进。</p>
+<figure class="highlight tex"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">\pgfdeclarelindenmayersystem&#123;Dragon Curve&#125;&#123;</span><br><span class="line">    \symbol&#123;X&#125;&#123;&#125;</span><br><span class="line">    \symbol&#123;Y&#125;&#123;&#125;</span><br><span class="line">    \symbol&#123;F&#125;&#123;\pgflsystemdrawforward&#125;</span><br><span class="line">    \symbol&#123;+&#125;&#123;\pgflsystemturnleft&#125;</span><br><span class="line">    \symbol&#123;-&#125;&#123;\pgflsystemturnright&#125;</span><br><span class="line">    \rule&#123;X -&gt; X+YF+&#125;</span><br><span class="line">    \rule&#123;Y -&gt; -FX−Y&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">\begin&#123;tikzpicture&#125;</span><br><span class="line">\draw[lindenmayer system&#x3D;&#123;Dragon Curve, axiom&#x3D;FX, order&#x3D;8, angle&#x3D;90&#125;]</span><br><span class="line">lindenmayer system;</span><br><span class="line">\end&#123;tikzpicture&#125;</span><br></pre></td></tr></table></figure>
+
+<p>示例代码绘制结果：<br>![Dragon Curve](/img/Dragon Curve.png)</p>
+<h2 id="谢尔宾斯基三角形-Sierpinski-triangle"><a href="#谢尔宾斯基三角形-Sierpinski-triangle" class="headerlink" title="谢尔宾斯基三角形(Sierpinski triangle)"></a>谢尔宾斯基三角形(Sierpinski triangle)</h2><p>谢尔宾斯基三角形是也是一种分形，它由波兰数学家谢尔宾斯基在 1915 年提出，它可以通过以下三步形成：</p>
+<ul>
+<li>绘制一个等边三角形</li>
+<li>连接每条边的中点，将其分为四个全等的等边三角形，并移除位于正中间的三角形</li>
+<li>对剩余的三角形重复上一步骤</li>
+</ul>
+<figure class="highlight tex"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">\pgfdeclarelindenmayersystem&#123;Sierpinski triangle&#125;&#123;</span><br><span class="line">  \rule&#123;F -&gt; G-F-G&#125;</span><br><span class="line">  \rule&#123;G -&gt; F+G+F&#125;&#125;</span><br><span class="line">\begin&#123;tikzpicture&#125;</span><br><span class="line">\shadedraw [top color&#x3D;white, bottom color&#x3D;blue!80, draw&#x3D;blue!80!black]</span><br><span class="line">[l-system&#x3D;&#123;Sierpinski triangle, step&#x3D;2pt, angle&#x3D;60, axiom&#x3D;F, order&#x3D;8&#125;]</span><br><span class="line">lindenmayer system -- cycle;</span><br><span class="line">\end&#123;tikzpicture&#125;</span><br></pre></td></tr></table></figure>
+
+<p>示例绘制结果如下：<br>![Sierpinski triangle](/img/Sierpinski triangle.png)</p>
+<h2 id="分形植物-Fractal-Plants"><a href="#分形植物-Fractal-Plants" class="headerlink" title="分形植物(Fractal Plants)"></a>分形植物(Fractal Plants)</h2><p>最后再来绘制一个漂亮的分形植物作为结束吧！</p>
+<figure class="highlight tex"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">\pgfdeclarelindenmayersystem&#123;Fractal plant&#125;&#123;</span><br><span class="line">  \rule&#123;X -&gt; F-[[X]+X]+F[+FX]-X&#125;</span><br><span class="line">  \rule&#123;F -&gt; FF&#125;&#125;</span><br><span class="line">\begin&#123;tikzpicture&#125;</span><br><span class="line">    \draw [green!50!black, rotate&#x3D;90]</span><br><span class="line">    [l-system&#x3D;&#123;Fractal plant, axiom&#x3D;X, order&#x3D;6, step&#x3D;2pt, angle&#x3D;25&#125;]</span><br><span class="line">    lindenmayer system; </span><br><span class="line">\end&#123;tikzpicture&#125;</span><br></pre></td></tr></table></figure>
+
+<p>绘制结果如图：<br><img src="/img/plants.png" alt="Plants"></p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>在 LaTeX 中系统中绘制分形图形最为重要的一点是了解图像的在L-System中的表达，好在在参考链接中L-System的维基百科中已经给出了大部分平面图形的L表达。最后 tikz的三维绘制能力相对较弱，三维分形绘制一般采用Mathematica绘制，在 <a target="_blank" rel="noopener" href="http://www.matrix67.com/blog/archives/6231">Matrix67</a>的博文中有一些采用 Mathematica 绘制的分形图形的示例。本文图形的着色参考了 tikz 用户手册的例子。最后需要注意的是由于在绘制时的递归需要不停的入栈，绘制程序非常耗内存，我在绘制order=20的龙形曲线就遇到过，可以手动调大 LaTeX 命令所占的内存来解决。</p>
+<h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><blockquote>
+<p>[1] <a target="_blank" rel="noopener" href="http://en.wikipedia.org/wiki/L-system">L - System</a><br>[2] <a target="_blank" rel="noopener" href="http://tex.stackexchange.com/questions/119602/how-to-create-a-sierpinski-triangle-in-LaTeX">How to create a Sierpinski triangle in LaTeX?</a><br>[3] <a target="_blank" rel="noopener" href="http://www.texample.net/tikz/examples/lindenmayer-systems/">Example: Lindenmayer systems</a></p>
+</blockquote>
+
+    </div>
+
+    
+    
+    
+      
+  <div class="popular-posts-header">相关文章</div>
+  <ul class="popular-posts">
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\archives\6949b60b.html" rel="bookmark">在 LaTeX 中使用流程图</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\archives\588652e8.html" rel="bookmark">如何在 LaTeX 文档中包含 Matlab 代码</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\archives\66d6b47.html" rel="bookmark">将 Matlab 图形嵌入 LaTeX 文档</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\archives\d8c3e7ac.html" rel="bookmark">如何在LaTeX中关联多幅图像</a></div>
+    </li>
+  </ul>
+
+
+    <footer class="post-footer">
+          <div class="reward-container">
+  <div>Buy me a coffee</div>
+  <button onclick="document.querySelector('.post-reward').classList.toggle('active');">
+    赞赏
+  </button>
+  <div class="post-reward">
+      <div>
+        <img src="/images/wechatpay.png" alt="三流先生 微信">
+        <span>微信</span>
+      </div>
+      <div>
+        <img src="/images/alipay.png" alt="三流先生 支付宝">
+        <span>支付宝</span>
+      </div>
+
+  </div>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/LaTeX/" rel="tag"># LaTeX</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/archives/d8c3e7ac.html" rel="prev" title="如何在LaTeX中关联多幅图像">
+                  <i class="fa fa-chevron-left"></i> 如何在LaTeX中关联多幅图像
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/archives/90c7b73f.html" rel="next" title="妈妈，你看">
+                  妈妈，你看 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      const activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      const commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 2011 – 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">三流先生</span>
+</div>
+<div class="wordcount">
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-line"></i>
+    </span>
+      <span>站点总字数：</span>
+    <span title="站点总字数">214k</span>
+  </span>
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span>站点阅读时长 &asymp;</span>
+    <span title="站点阅读时长">3:15</span>
+  </span>
+</div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="//cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+
+
+  <script async src="/js/fireworks.js"></script>
+
+
+
+
+  <script src="/js/activate-power-mode.min.js"></script>
+  <script>
+    POWERMODE.colorful = true;
+    POWERMODE.shake = false;
+    document.body.addEventListener('input', POWERMODE);
+  </script>
+
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"log":false,"model":{"jsonPath":"/live2dw/assets/miku.model.json"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":true},"react":{"opacity":0.7}});</script></body>
+</html>
