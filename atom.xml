@@ -6,7 +6,7 @@
   <link href="http://wangmurong.org.cn/atom.xml" rel="self"/>
   
   <link href="http://wangmurong.org.cn/"/>
-  <updated>2020-11-18T06:51:54.725Z</updated>
+  <updated>2020-11-30T08:20:26.257Z</updated>
   <id>http://wangmurong.org.cn/</id>
   
   <author>
@@ -15,6 +15,23 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>为离开的人歌唱吧</title>
+    <link href="http://wangmurong.org.cn/archives/48dd8d33.html"/>
+    <id>http://wangmurong.org.cn/archives/48dd8d33.html</id>
+    <published>2020-11-14T22:45:31.000Z</published>
+    <updated>2020-11-30T08:20:26.257Z</updated>
+    
+    
+    <summary type="html">&lt;p&gt;在得知奶奶的病情后，我就想到了用这句歌词做题目，这句歌词出自韩剧《请回答1988》的插曲《你不要担心》。在几年前爷爷猝然与世长辞后，当时总会设想要是能留些许告别的时间该多好。在今年三月份，奶奶检查出严重肝腹水后，从医学上来说，已经进入了生命的倒计时。刚知道检查结果时心底一直在盼望着是诊断错误，在多位医生诊断结论基本一致后，又幻想着能有特殊体质的奇迹。然而那个难以接受的结果在9月份还是来临了。在此之前，反复的给自己做足了心理建设，然而在听到结果那一霎，还是忍不住泪如雨下。从办公室骑车回出租房的过程中，眼泪流了一路。惋惜、伤心、懊悔各种负面情绪交织在心头。</summary>
+    
+    
+    
+    
+    <category term="总结" scheme="http://wangmurong.org.cn/tags/%E6%80%BB%E7%BB%93/"/>
+    
+  </entry>
   
   <entry>
     <title>且慢，前面听说风很大</title>
@@ -377,26 +394,6 @@
     
     
     <category term="书评" scheme="http://wangmurong.org.cn/tags/%E4%B9%A6%E8%AF%84/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>中文文案排版指北</title>
-    <link href="http://wangmurong.org.cn/archives/8da3d4bd.html"/>
-    <id>http://wangmurong.org.cn/archives/8da3d4bd.html</id>
-    <published>2015-07-04T15:26:03.000Z</published>
-    <updated>2020-11-18T06:51:53.299Z</updated>
-    
-    
-    <summary type="html">&lt;p&gt;本文转自 Sparanoid 的 &lt;a href=&quot;http://sparanoid.com/about/&quot;&gt;博客&lt;/a&gt;, &lt;a href=&quot;https://github.com/sparanoid/chinese-copywriting-guidelines&quot;&gt;原文链接&lt;/a&gt;&lt;/p&gt;
-&lt;p&gt;統一中文文案、排版的相關用法，降低團隊成員之間的溝通成本，增強網站氣質。</summary>
-    
-    
-    
-    <category term="排版" scheme="http://wangmurong.org.cn/categories/%E6%8E%92%E7%89%88/"/>
-    
-    
-    <category term="转载" scheme="http://wangmurong.org.cn/tags/%E8%BD%AC%E8%BD%BD/"/>
     
   </entry>
   
