@@ -34,46 +34,6 @@
   </entry>
   
   <entry>
-    <title>R处理Dicom文件基础</title>
-    <link href="http://wangmurong.org.cn/archives/253d458f.html"/>
-    <id>http://wangmurong.org.cn/archives/253d458f.html</id>
-    <published>2020-12-01T09:10:08.000Z</published>
-    <updated>2020-12-03T02:22:53.023Z</updated>
-    
-    
-    
-    
-    
-    <category term="R" scheme="http://wangmurong.org.cn/tags/R/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>生存分析那些事儿</title>
-    <link href="http://wangmurong.org.cn/archives/75861ef9.html"/>
-    <id>http://wangmurong.org.cn/archives/75861ef9.html</id>
-    <published>2020-12-01T08:29:32.000Z</published>
-    <updated>2020-12-03T02:22:53.024Z</updated>
-    
-    
-      
-      
-        
-        
-    <summary type="html">&lt;h1 id=&quot;生存分析概念&quot;&gt;&lt;a href=&quot;#生存分析概念&quot; class=&quot;headerlink&quot; title=&quot;生存分析概念&quot;&gt;&lt;/a&gt;生存分析概念&lt;/h1&gt;&lt;h1 id=&quot;生存分析可视化&quot;&gt;&lt;a href=&quot;#生存分析可视化&quot; class=&quot;headerlink&quot;</summary>
-        
-      
-    
-    
-    
-    <category term="生信" scheme="http://wangmurong.org.cn/categories/%E7%94%9F%E4%BF%A1/"/>
-    
-    
-    <category term="生存分析" scheme="http://wangmurong.org.cn/tags/%E7%94%9F%E5%AD%98%E5%88%86%E6%9E%90/"/>
-    
-  </entry>
-  
-  <entry>
     <title>为离开的人歌唱吧</title>
     <link href="http://wangmurong.org.cn/archives/48dd8d33.html"/>
     <id>http://wangmurong.org.cn/archives/48dd8d33.html</id>
@@ -387,6 +347,44 @@
     
     
     <summary type="html">&lt;p&gt;近来由于数据记录和属性规模的急剧增长，大数据处理平台和并行数据分析算法也随之出现。于此同时，这也推动了数据降维处理的应用。实际上，数据量有时过犹不及。有时在数据分析应用中大量的数据反而会产生更坏的性能。</summary>
+    
+    
+    
+    <category term="翻译" scheme="http://wangmurong.org.cn/categories/%E7%BF%BB%E8%AF%91/"/>
+    
+    
+    <category term="翻译" scheme="http://wangmurong.org.cn/tags/%E7%BF%BB%E8%AF%91/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>如何撰写文献评述</title>
+    <link href="http://wangmurong.org.cn/archives/76ca9339.html"/>
+    <id>http://wangmurong.org.cn/archives/76ca9339.html</id>
+    <published>2015-09-13T00:00:00.000Z</published>
+    <updated>2020-11-18T06:51:54.693Z</updated>
+    
+    
+    <summary type="html">&lt;p&gt;文章评论不仅是其他作者文章的总结还包括对文章的评价。老师通常通过布置学生撰写文献评论来引导学生进入专业的研究领域。专家也经常需要对其他专家的工作进行评述。对文章主要论点和论据的理解是进行准确评述的必要条件。合理的评论文章的主题，论据以及理解进一步的研究点是撰写文章评述的重要元素。下面是撰写文献评论的一些参考意见。</summary>
+    
+    
+    
+    <category term="翻译" scheme="http://wangmurong.org.cn/categories/%E7%BF%BB%E8%AF%91/"/>
+    
+    
+    <category term="翻译" scheme="http://wangmurong.org.cn/tags/%E7%BF%BB%E8%AF%91/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>通往数据科学家之路</title>
+    <link href="http://wangmurong.org.cn/archives/8176357a.html"/>
+    <id>http://wangmurong.org.cn/archives/8176357a.html</id>
+    <published>2015-09-06T00:00:00.000Z</published>
+    <updated>2020-11-18T06:51:54.692Z</updated>
+    
+    
+    <summary type="html">&lt;p&gt;经常有人问我“要成为数据挖掘工程师或者数据科学家应该读什么书？”类似的问题。下面是一份建议书单，同时也是成为数据科学家的指南，当然，这不包括取得合适大学学位的要求。&lt;br&gt;在深入探讨之前，数据科学家似乎需要掌握许多技巧，如：统计学、编程、数据库、演讲技巧、数据清理与变换知识。</summary>
     
     
     
